@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class Vgg:
+class VggTensorFlow:
     def build_model():
         # input
         i = tf.keras.layers.Input(shape=(224, 224, 3))
