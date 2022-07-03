@@ -56,23 +56,23 @@ class ResNetTensorFlow:
         x = tf.keras.layers.Activation('relu')(x)
         x = tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2))(x)
 
-        x = self.convolutional_block(x, f=3, filters=[64, 64, 256], s=1)
+        x = self.convolutional_block(x, f=3, filters=[64, 64, 256], s=(1, 1))
         x = self.identity_block(x, 3, [64, 64, 256])
         x = self.identity_block(x, 3, [64, 64, 256])
 
-        x = self.convolutional_block(x, f=3, filters=[128, 128, 512], s=2)
+        x = self.convolutional_block(x, f=3, filters=[128, 128, 512], s=(2, 2))
         x = self.identity_block(x, 3, [128, 128, 512])
         x = self.identity_block(x, 3, [128, 128, 512])
         x = self.identity_block(x, 3, [128, 128, 512])
 
-        x = self.convolutional_block(x, f=3, filters=[256, 256, 1024], s=2)
+        x = self.convolutional_block(x, f=3, filters=[256, 256, 1024], s=(2, 2))
         x = self.identity_block(x, 3, [256, 256, 1024])
         x = self.identity_block(x, 3, [256, 256, 1024])
         x = self.identity_block(x, 3, [256, 256, 1024])
         x = self.identity_block(x, 3, [256, 256, 1024])
         x = self.identity_block(x, 3, [256, 256, 1024])
 
-        x = self.convolutional_block(x, f=3, filters=[512, 512, 2048], s=2)
+        x = self.convolutional_block(x, f=3, filters=[512, 512, 2048], s=(2, 2))
         x = self.identity_block(x, 3, [512, 512, 2048])
         x = self.identity_block(x, 3, [512, 512, 2048])
 
