@@ -3,44 +3,39 @@ import numpy as np
 import cv2 as cv
 
 def load_fer2013(filepath):
+    # read data
     df = pd.read_csv(filepath)
+
+    # partition data into training, and test sets
     df_train = df[df['Usage'] == 'Training']
     df_test = df[df['Usage'] == 'PublicTest']
 
-    x_train = []
-    x_test = []
-    x_train_tmp = []
-    x_test_tmp = []
+    # get pixels
+    x_train = df_train['pixels']
+    x_test = df_test['pixels']
 
-    for image_pixels_string in df_train.iloc[0:,1]:
-        x_train.append(np.asarray(image_pixels_string.split(' '), dtype=np.uint8).reshape(48,48))
+    # get labels
+    y_train = df_train['emotion']
+    y_test = df_test['emotion']
 
-    for image_pixels_string in df_test.iloc[0:,1]:
-        x_test.append(np.asarray(image_pixels_string.split(' '), dtype=np.uint8).reshape(48,48))
+    # split pixels
+    x_train = np.array([np.fromstring(x, sep=' ') for x in x_train])
+    x_test = np.array([np.fromstring(x, sep=' ') for x in x_test])
 
-    x_train = np.asarray(x_train)
-    x_test = np.asarray(x_test)
+    # reshape pixels
+    x_train = x_train.reshape(len(df_train), 48, 48)
+    x_test = x_test.reshape(len(df_test), 48, 48)
 
-    for image in x_train:
-        tmp = []
-        for height in image:
-            for pixel in height:
-                tmp.append(np.asarray([pixel,pixel,pixel]))
-        x_train_tmp.append(cv.resize(np.asarray(tmp).reshape(48,48,3),(224,224)))
+    # normalize pixels
+    x_train /= 255
+    x_test /= 255
 
-    for image in x_test:
-        tmp = []
-        for height in image:
-            for pixel in height:
-                tmp.append(np.asarray([pixel,pixel,pixel]))
-        x_test_tmp.append(cv.resize(np.asarray(tmp).reshape(48,48,3),(224,224)))
+    # convert pixels into rgb
+    x_train = np.stack((x_train,)*3, axis=-1)
+    x_test = np.stack((x_test,)*3, axis=-1)
 
-    x_train = np.asarray(x_train_tmp)
-    x_train_tmp = []
-    x_test = np.asarray(x_test_tmp)
-    x_test_tmp = []
-
-    y_train = df_train.iloc[0:,0].values
-    y_test = df_test.iloc[0:,0].values
+    # resize images into 224x224
+    x_train = np.array([cv.resize(x, (224, 224)) for x in x_train])
+    x_test = np.array([cv.resize(x, (224, 224)) for x in x_test])
 
     return x_train, y_train, x_test, y_test
