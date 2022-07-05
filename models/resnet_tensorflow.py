@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class ResNetTensorFlow:
-    def identity_block(input, filter_size, filters):
+    def identity_block(self, input, filter_size, filters):
         f1, f2, f3 = filters
 
         bn_axis = 3
@@ -26,7 +26,7 @@ class ResNetTensorFlow:
 
         return x
 
-    def convolutional_block(input, filter_size, filters, strides=(2, 2)):
+    def convolutional_block(self, input, filter_size, filters, strides=(2, 2)):
         f1, f2, f3 = filters
 
         bn_axis = 3
@@ -55,7 +55,7 @@ class ResNetTensorFlow:
 
         return x
 
-    def ResNet50(self, input_shape=(224, 224, 3), classes=6):
+    def build_model(self, input_shape=(224, 224, 3), classes=7):
         # get shape of input
         i = tf.keras.layers.Input(input_shape)
 
@@ -69,18 +69,18 @@ class ResNetTensorFlow:
         x = tf.keras.layers.MaxPooling2D((3, 3), strides=(2, 2))(x)
 
         # stage 2
-        x = self.convolutional_block(x, f=3, filters=[64, 64, 256], s=(1, 1))
+        x = self.convolutional_block(x, filter_size=3, filters=[64, 64, 256], strides=(1, 1))
         x = self.identity_block(x, 3, [64, 64, 256])
         x = self.identity_block(x, 3, [64, 64, 256])
 
         # stage 3
-        x = self.convolutional_block(x, f=3, filters=[128, 128, 512], s=(2, 2))
+        x = self.convolutional_block(x, filter_size=3, filters=[128, 128, 512], strides=(2, 2))
         x = self.identity_block(x, 3, [128, 128, 512])
         x = self.identity_block(x, 3, [128, 128, 512])
         x = self.identity_block(x, 3, [128, 128, 512])
 
         # stage 4
-        x = self.convolutional_block(x, f=3, filters=[256, 256, 1024], s=(2, 2))
+        x = self.convolutional_block(x, filter_size=3, filters=[256, 256, 1024], strides=(2, 2))
         x = self.identity_block(x, 3, [256, 256, 1024])
         x = self.identity_block(x, 3, [256, 256, 1024])
         x = self.identity_block(x, 3, [256, 256, 1024])
@@ -88,7 +88,7 @@ class ResNetTensorFlow:
         x = self.identity_block(x, 3, [256, 256, 1024])
 
         #stage 5
-        x = self.convolutional_block(x, f=3, filters=[512, 512, 2048], s=(2, 2))
+        x = self.convolutional_block(x, filter_size=3, filters=[512, 512, 2048], strides=(2, 2))
         x = self.identity_block(x, 3, [512, 512, 2048])
         x = self.identity_block(x, 3, [512, 512, 2048])
 
@@ -99,13 +99,10 @@ class ResNetTensorFlow:
         x = tf.keras.layers.Flatten()(x)
         x = tf.keras.layers.Dense(classes, activation='softmax')(x)
 
-        model = tf.keras.Model(i, x)
-        return model
+        self.model = tf.keras.Model(i, x)
 
-    def compile_model(model):
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        return model
+    def compile_model(self):
+        self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-    def train_model(model, train_data, train_labels, test_data, test_labels, epochs=10):
-        model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
-        return model
+    def train_model(self, train_data, train_labels, test_data, test_labels, epochs=10):
+        self.model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
