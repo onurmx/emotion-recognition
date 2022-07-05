@@ -42,7 +42,7 @@ class VggTensorFlow:
         self.model = tf.keras.Model(i, x)
     
     def compile_model(self):
-        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     
     def train_model(self, train_data, train_labels, test_data, test_labels, epochs=10):
         self.model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
