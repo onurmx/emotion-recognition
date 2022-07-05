@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class VggTensorFlow:
-    def build_model():
+    def build_model(self):
         # input
         i = tf.keras.layers.Input(shape=(224, 224, 3))
         
@@ -39,13 +39,10 @@ class VggTensorFlow:
         x = tf.keras.layers.Dense(4096, activation='relu', name='fc2')(x)
         x = tf.keras.layers.Dense(1000, activation='softmax', name='predictions')(x)
 
-        model = tf.keras.Model(i, x)
-        return model
+        self.model = tf.keras.Model(i, x)
     
-    def compile_model(model):
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        return model
+    def compile_model(self):
+        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     
-    def train_model(model, train_data, train_labels, test_data, test_labels, epochs=10):
-        model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
-        return model
+    def train_model(self, train_data, train_labels, test_data, test_labels, epochs=10):
+        self.model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
