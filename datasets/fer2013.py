@@ -13,9 +13,6 @@ def load_fer2013(filepath):
     y_train = df[df['Usage'] == 'Training']['emotion']
     y_test = df[df['Usage'] == 'PublicTest']['emotion']
 
-    # destroy dataframe
-    del df
-
     # split pixels
     x_train = np.array([np.fromstring(x, sep=' ') for x in x_train])
     x_test = np.array([np.fromstring(x, sep=' ') for x in x_test])
