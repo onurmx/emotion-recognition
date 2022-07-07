@@ -1,9 +1,11 @@
+# VGG-16 implementation in TensorFlow
+
 import tensorflow as tf
 
 class VggTensorFlow:
-    def build_model(self):
+    def build_model(self, input_shape=(224, 224, 3)):
         # input
-        i = tf.keras.layers.Input(shape=(224, 224, 3))
+        i = tf.keras.layers.Input(shape=input_shape)
         
         # block 1
         x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1')(i)
@@ -41,8 +43,8 @@ class VggTensorFlow:
 
         self.model = tf.keras.Model(i, x)
     
-    def compile_model(self):
-        self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    def compile_model(self, optmizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy']):
+        self.model.compile(optimizer=optmizer, loss=loss, metrics=metrics)
     
     def train_model(self, train_data, train_labels, test_data, test_labels, epochs=10):
         self.model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
