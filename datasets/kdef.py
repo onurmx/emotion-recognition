@@ -21,7 +21,7 @@ def load_kdef(filepath, image_height=224, image_width=224):
 
     # load images and labels
     for file_arg, file_path in enumerate(file_paths):
-        image = cv2.imread(file_path)
+        image = cv2.imread(file_path) / 255
         image = cv2.resize(image, (image_height, image_width))
         faces[file_arg] = image
         file_basename = os.path.basename(file_path)
