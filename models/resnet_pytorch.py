@@ -1,3 +1,5 @@
+# ResNet implementation in PyTorch
+
 import torch
 
 class Bottleneck(torch.nn.Module):
