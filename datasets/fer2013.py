@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-def load_fer2013(filepath, batch_size=128):
+def load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_size=128):
     # read data
     df = pd.read_csv(filepath)
 
@@ -23,12 +23,14 @@ def load_fer2013(filepath, batch_size=128):
     x_test = x_test.reshape(len(x_test), 48, 48)
 
     # convert pixels into rgb
-    x_train = np.stack((x_train,)*3, axis=-1)
-    x_test = np.stack((x_test,)*3, axis=-1)
+    if convert_to_rgb:
+        x_train = np.stack((x_train,)*3, axis=-1)
+        x_test = np.stack((x_test,)*3, axis=-1)
 
-    # upsample images into 240x240
-    x_train = np.array([x.repeat(5, axis=0).repeat(5, axis=1) for x in x_train])
-    x_test = np.array([x.repeat(5, axis=0).repeat(5, axis=1) for x in x_test])
+    # upsample images by upsample factor
+    if upsample:
+        x_train = np.array([x.repeat(upsample, axis=0).repeat(upsample, axis=1) for x in x_train])
+        x_test = np.array([x.repeat(upsample, axis=0).repeat(upsample, axis=1) for x in x_test])
 
     # calculate steps per epoch and validation steps
     steps_per_epoch = len(x_train) // batch_size
