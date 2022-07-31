@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-def load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_size=128):
+def tf_load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_size=128):
     # read data
     df = pd.read_csv(filepath)
 
