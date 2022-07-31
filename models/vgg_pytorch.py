@@ -3,7 +3,7 @@
 import torch
 
 class VggTorch(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes=1000):
         super(VggTorch, self).__init__()
 
         # block 1
@@ -37,7 +37,7 @@ class VggTorch(torch.nn.Module):
         # fully connected layer
         self.fc14 = torch.nn.Linear(512 * 7 * 7, 4096)
         self.fc15 = torch.nn.Linear(4096, 4096)
-        self.fc16 = torch.nn.Linear(4096, 1000)
+        self.fc16 = torch.nn.Linear(4096, num_classes)
 
     def forward(self, x):
         # block 1

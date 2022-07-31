@@ -55,7 +55,7 @@ class ResNetTensorFlow:
 
         return x
 
-    def build_model(self, input_shape=(224, 224, 3), classes=1000):
+    def build_model(self, input_shape=(224, 224, 3), num_classes=1000):
         # get shape of input
         i = tf.keras.layers.Input(input_shape)
 
@@ -96,6 +96,7 @@ class ResNetTensorFlow:
         x = tf.keras.layers.AveragePooling2D((2, 2))(x)
 
         # output layer
-        x = tf.keras.layers.Dense(classes, activation='softmax')(x)
+        x = tf.keras.layers.Flatten()(x)
+        x = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
 
         self.model = tf.keras.Model(i, x)

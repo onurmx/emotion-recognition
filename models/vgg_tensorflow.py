@@ -3,7 +3,7 @@
 import tensorflow as tf
 
 class VggTensorFlow:
-    def build_model(self, input_shape=(224, 224, 3)):
+    def build_model(self, input_shape=(224, 224, 3), num_classes=1000):
         # input
         i = tf.keras.layers.Input(shape=input_shape)
         
@@ -39,6 +39,6 @@ class VggTensorFlow:
         x = tf.keras.layers.Flatten(name='flatten')(x)
         x = tf.keras.layers.Dense(4096, activation='relu', name='fc1')(x)
         x = tf.keras.layers.Dense(4096, activation='relu', name='fc2')(x)
-        x = tf.keras.layers.Dense(1000, activation='softmax', name='predictions')(x)
+        x = tf.keras.layers.Dense(num_classes, activation='softmax', name='predictions')(x)
 
         self.model = tf.keras.Model(i, x)
