@@ -100,3 +100,9 @@ class ResNetTensorFlow:
         x = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
 
         self.model = tf.keras.Model(i, x)
+
+    def compile_model(self, optmizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy']):
+        self.model.compile(optimizer=optmizer, loss=loss, metrics=metrics)
+
+    def train_model(self, train_data, train_labels, test_data, test_labels, epochs=10):
+        self.model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
