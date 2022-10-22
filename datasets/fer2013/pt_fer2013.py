@@ -1,78 +1,63 @@
+import numpy as np
+import pandas as pd
 import torch
 import torchvision
-import pandas as pd
-import numpy as np
+import utils
 
-class FileReader:
-    def __init__(self, csv_file_name):
-        self._csv_file_name = csv_file_name
-    def read(self):
-        self._data = pd.read_csv(self._csv_file_name)
-
-class Data:
-    def __init__(self, data):
-        self._x_train, self._y_train = [],  []
-        self._x_test, self._y_test = [], []
-        self._x_valid, self._y_valid = [], []
-
-        for xdx, x in enumerate(data.values):
-            pixels = []
-            label = None
-            for idx, i in enumerate(x[1].split(' ')):
-                pixels.append(int(i))
-            pixels = np.array(pixels).reshape((1, 48, 48))
-
-            if x[2] == 'Training':
-                self._x_train.append(pixels)
-                self._y_train.append(int(x[0]))
-            elif x[2] == 'PublicTest':
-                self._x_test.append(pixels)
-                self._y_test.append(int(x[0]))
-            else:
-                self._x_valid.append(pixels)
-                self._y_valid.append(int(x[0]))
-        self._x_train, self._y_train = np.array(self._x_train).reshape((len(self._x_train), 1, 48, 48)),\
-            np.array(self._y_train, dtype=np.int64)
-        self._x_test, self._y_test = np.array(self._x_test).reshape((len(self._x_test), 1, 48, 48)),\
-            np.array(self._y_test, dtype=np.int64)
-        self._x_valid, self._y_valid = np.array(self._x_valid).reshape((len(self._x_valid), 1, 48, 48)),\
-            np.array(self._y_valid, dtype=np.int64)
-
-class FER2013Dataset(torch.utils.data.Dataset):
-    def __init__(self, X, Y, transform=None):
-        self.transform = transform
-        self._X = X
-        self._y = Y
-
+class FER2013(torch.utils.data.Dataset):
+    def __init__(self, df, transforms=None):
+        self.df = df
+        self.transforms = transforms
+        
     def __len__(self):
-        return len(self._X)
+        return len(self.df)
+    
+    def __getitem__(self, index):
+        row = self.df.loc[index]
+        image, label = np.array([x.split() for x in self.df.loc[index, ['pixels']]]), row['emotion']
+        image = np.asarray(image).astype(np.uint8).reshape(48,48)
+        image = np.stack((image,)*3, axis=-1)
+       
+        if self.transforms:
+            image = self.transforms(image)
+            
+        return image.clone().detach(), label
 
-    def __getitem__(self, idx):
-        if self.transform:
-          return {'inputs': self.transform(self._X[idx]), 'labels': self._y[idx]}
-        return {'inputs': self._X[idx], 'labels': self._y[idx]}
+def pt_load_fer2013(filepath, stats=([0.5],[0.5]), batch_size = 128):
+    device = utils.get_default_device()
+    
+    df = pd.read_csv(filepath)
 
-def tf_load_fer2013(filepath):
-    file_reader = FileReader(filepath)
-    file_reader.read()
+    train_df = df[df['Usage']=='Training']
+    valid_df = df[df['Usage']=='PublicTest']
+    test_df = df[df['Usage']=='PrivateTest']
 
-    data = Data(file_reader._data)
-    data._x_train = np.asarray(data._x_train, dtype=np.float64)
-    data._x_train -= np.mean(data._x_train, axis=0)
+    valid_df = valid_df.reset_index(drop=True) 
+    test_df = test_df.reset_index(drop = True)
 
-    preprocess = torchvision.transforms.Compose([
-        torchvision.transforms.RandomHorizontalFlip(),
-        torchvision.transforms.RandomRotation(6),
-        torchvision.transforms.ColorJitter()
+    train_transformations = torchvision.transforms.Compose([   
+        torchvision.transforms.ToPILImage(),
+        torchvision.transforms.Resize((224,224)),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(*stats,inplace=True)
+    ])
+    valid_transformations = torchvision.transforms.Compose([
+        torchvision.transforms.ToPILImage(),
+        torchvision.transforms.Resize((224,224)),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(*stats,inplace=True)
     ])
 
-    train_set = FER2013Dataset(
-        data._x_train, data._y_train, transform=preprocess)
-    test_set = FER2013Dataset(data._x_valid, data._y_valid)
+    train_ds = FER2013(train_df, train_transformations)
+    valid_ds = FER2013(valid_df, valid_transformations)
+    test_ds = FER2013(test_df, valid_transformations)
 
-    train_loader = torch.utils.data.DataLoader(
-        train_set, batch_size=128, num_workers=0, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(
-        test_set, batch_size=128, num_workers=0, shuffle=False)
+    train_dl = torch.utils.data.DataLoader(train_ds, batch_size, shuffle=True, num_workers=3, pin_memory=True)
+    valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size*2, num_workers=2, pin_memory=True)
+    test_dl = torch.utils.data.DataLoader(test_ds, batch_size*2, num_workers=2, pin_memory=True)
 
-    return train_loader, test_loader
+    train_dl = utils.DeviceDataLoader(train_dl, device)
+    valid_dl = utils.DeviceDataLoader(valid_dl, device)
+    test_dl = utils.DeviceDataLoader(test_dl, device)
+    
+    return train_dl, valid_dl, test_dl
