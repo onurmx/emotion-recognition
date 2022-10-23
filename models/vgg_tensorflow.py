@@ -2,7 +2,7 @@
 
 import tensorflow as tf
 
-class VggTensorFlow:
+class VGG16TensorFlow:
     def build_model(self, input_shape=(224, 224, 3), num_classes=1000):
         # input
         i = tf.keras.layers.Input(shape=input_shape)

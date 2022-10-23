@@ -3,9 +3,9 @@
 import torch
 import utils
 
-class VggPytorch(utils.ImageClassificationBase):
+class VGG16Pytorch(utils.ImageClassificationBase):
     def __init__(self, num_classes=10):
-        super(VggPytorch, self).__init__()
+        super(VGG16Pytorch, self).__init__()
 
         # block 1
         self.layer1 = torch.nn.Sequential(
@@ -141,3 +141,6 @@ class VggPytorch(utils.ImageClassificationBase):
         out = self.fc1(out)
         out = self.fc2(out)
         return out
+
+def pt_VGG16(num_classes):
+    return VGG16Pytorch(num_classes)
