@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import sklearn.model_selection as skl
 
-def load_kdef(filepath, image_height=224, image_width=224):
+def np_load_kdef(filepath, image_height=224, image_width=224):
     # define labels
     labels = {'AN': 0, 'DI': 1, 'AF': 2, 'HA': 3, 'SA': 4, 'SU': 5, 'NE': 6}
 

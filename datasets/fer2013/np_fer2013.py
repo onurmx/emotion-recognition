@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def load_fer2013(filepath):
+def np_load_fer2013(filepath):
     # read data
     df = pd.read_csv(filepath)
 
