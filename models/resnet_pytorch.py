@@ -1,64 +1,110 @@
 # ResNet implementation in PyTorch
 
 import torch
+import utils
 
-class Bottleneck(torch.nn.Module):
-    expansion = 4
-
-    def __init__(self, in_channels, out_channels, stride=1):
-        super(Bottleneck, self).__init__()
-        self.conv1 = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False)
+class Block(torch.nn.Module):
+    def __init__(self, num_layers, in_channels, out_channels, identity_downsample=None, stride=1):
+        assert num_layers in [18, 34, 50, 101, 152], "should be a a valid architecture"
+        super(Block, self).__init__()
+        self.num_layers = num_layers
+        if self.num_layers > 34:
+            self.expansion = 4
+        else:
+            self.expansion = 1
+        # ResNet50, 101, and 152 include additional layer of 1x1 kernels
+        self.conv1 = torch.nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1, padding=0)
         self.bn1 = torch.nn.BatchNorm2d(out_channels)
-        self.conv2 = torch.nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False)
+        if self.num_layers > 34:
+            self.conv2 = torch.nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=stride, padding=1)
+        else:
+            # for ResNet18 and 34, connect input directly to (3x3) kernel (skip first (1x1))
+            self.conv2 = torch.nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1)
         self.bn2 = torch.nn.BatchNorm2d(out_channels)
-        self.conv3 = torch.nn.Conv2d(out_channels, out_channels * self.expansion, kernel_size=1, bias=False)
+        self.conv3 = torch.nn.Conv2d(out_channels, out_channels * self.expansion, kernel_size=1, stride=1, padding=0)
         self.bn3 = torch.nn.BatchNorm2d(out_channels * self.expansion)
-        
-        self.shortcut = torch.nn.Sequential()
-        if stride != 1 or in_channels != out_channels * self.expansion:
-            self.shortcut = torch.nn.Sequential(
-                torch.nn.Conv2d(in_channels, out_channels * self.expansion, kernel_size=1, stride=stride, bias=False),
-                torch.nn.BatchNorm2d(out_channels * self.expansion)
-            )
+        self.relu = torch.nn.ReLU()
+        self.identity_downsample = identity_downsample
 
     def forward(self, x):
-        out = torch.nn.functional.relu(self.bn1(self.conv1(x)))
-        out = torch.nn.functional.relu(self.bn2(self.conv2(out)))
-        out = self.bn3(self.conv3(out))
-        out += self.shortcut(x)
-        out = torch.nn.functional.relu(out)
-        return out
+        identity = x
+        if self.num_layers > 34:
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.relu(x)
+        x = self.conv2(x)
+        x = self.bn2(x)
+        x = self.relu(x)
+        x = self.conv3(x)
+        x = self.bn3(x)
 
-    
-class ResNet(torch.nn.Module):
-    def __init__(self, block, num_blocks, num_classes=1000):
-        super(ResNet, self).__init__()
+        if self.identity_downsample is not None:
+            identity = self.identity_downsample(identity)
+
+        x += identity
+        x = self.relu(x)
+        return x
+
+
+class ResNetBase(utils.ImageClassificationBase):
+    def __init__(self, num_layers, block, image_channels, num_classes):
+        assert num_layers in [18, 34, 50, 101, 152], f'ResNet{num_layers}: Unknown architecture! Number of layers has ' \
+                                                     f'to be 18, 34, 50, 101, or 152 '
+        super(ResNetBase, self).__init__()
+        if num_layers < 50:
+            self.expansion = 1
+        else:
+            self.expansion = 4
+        if num_layers == 18:
+            layers = [2, 2, 2, 2]
+        elif num_layers == 34 or num_layers == 50:
+            layers = [3, 4, 6, 3]
+        elif num_layers == 101:
+            layers = [3, 4, 23, 3]
+        else:
+            layers = [3, 8, 36, 3]
         self.in_channels = 64
-
-        self.conv1 = torch.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.conv1 = torch.nn.Conv2d(image_channels, 64, kernel_size=7, stride=2, padding=3)
         self.bn1 = torch.nn.BatchNorm2d(64)
+        self.relu = torch.nn.ReLU()
         self.maxpool = torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
-        self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
-        self.linear = torch.nn.Linear(512 * block.expansion, num_classes)
 
-    def _make_layer(self, block, out_channels, num_blocks, stride):
-        strides = [stride] + [1] * (num_blocks - 1)
+        # ResNetLayers
+        self.layer1 = self.make_layers(num_layers, block, layers[0], intermediate_channels=64, stride=1)
+        self.layer2 = self.make_layers(num_layers, block, layers[1], intermediate_channels=128, stride=2)
+        self.layer3 = self.make_layers(num_layers, block, layers[2], intermediate_channels=256, stride=2)
+        self.layer4 = self.make_layers(num_layers, block, layers[3], intermediate_channels=512, stride=2)
+
+        self.avgpool = torch.nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = torch.nn.Linear(512 * self.expansion, num_classes)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+
+        x = self.avgpool(x)
+        x = x.reshape(x.shape[0], -1)
+        x = self.fc(x)
+        return x
+
+    def make_layers(self, num_layers, block, num_residual_blocks, intermediate_channels, stride):
         layers = []
-        for stride in strides:
-            layers.append(block(self.in_channels, out_channels, stride))
-            self.in_channels = out_channels * block.expansion
+
+        identity_downsample = torch.nn.Sequential(
+            torch.nn.Conv2d(self.in_channels, intermediate_channels * self.expansion, kernel_size=1, stride=stride),
+            torch.nn.BatchNorm2d(intermediate_channels * self.expansion))
+        layers.append(block(num_layers, self.in_channels, intermediate_channels, identity_downsample, stride))
+        self.in_channels = intermediate_channels * self.expansion  # 256
+        for i in range(num_residual_blocks - 1):
+            layers.append(block(num_layers, self.in_channels, intermediate_channels))  # 256 -> 64, 64*4 (256) again
         return torch.nn.Sequential(*layers)
 
-    def forward(self, x):
-        out = torch.nn.functional.relu(self.bn1(self.conv1(x)))
-        out = self.layer1(out)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = self.layer4(out)
-        out = torch.nn.functional.avg_pool2d(out, 4)
-        out = out.view(out.size(0), -1)
-        out = self.linear(out)
-        return out
+def ResNet50_pt(img_channels=3, num_classes=1000):
+    return ResNetBase(50, Block, img_channels, num_classes)

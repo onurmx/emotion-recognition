@@ -23,9 +23,7 @@ class FER2013(torch.utils.data.Dataset):
             
         return image.clone().detach(), label
 
-def pt_load_fer2013(filepath, stats=([0.5],[0.5]), batch_size = 128):
-    device = utils.get_default_device()
-    
+def pt_load_fer2013(filepath, device, batch_size=64, stats=([0.5],[0.5])):
     df = pd.read_csv(filepath)
 
     train_df = df[df['Usage']=='Training']
@@ -56,8 +54,10 @@ def pt_load_fer2013(filepath, stats=([0.5],[0.5]), batch_size = 128):
     valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size*2, num_workers=2, pin_memory=True)
     test_dl = torch.utils.data.DataLoader(test_ds, batch_size*2, num_workers=2, pin_memory=True)
 
+    torch.cuda.empty_cache()
+
     train_dl = utils.DeviceDataLoader(train_dl, device)
     valid_dl = utils.DeviceDataLoader(valid_dl, device)
     test_dl = utils.DeviceDataLoader(test_dl, device)
-    
+
     return train_dl, valid_dl, test_dl
