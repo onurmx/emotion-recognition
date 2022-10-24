@@ -43,8 +43,18 @@ class VGG16TensorFlow:
 
         self.model = tf.keras.Model(i, x)
 
-    def compile_model(self, optmizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy']):
-        self.model.compile(optimizer=optmizer, loss=loss, metrics=metrics)
+    def compile_model(self, optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(), metrics=['accuracy']):
+        self.model.compile(
+            optimizer=optimizer,
+            loss=loss,
+            metrics=metrics
+        )
 
-    def train_model(self, train_data, train_labels, test_data, test_labels, epochs=10):
-        self.model.fit(train_data, train_labels, epochs=epochs, validation_data=(test_data, test_labels))
+    def train_model(self, training_data, validation_data, epochs, steps_per_epoch, validation_steps):
+        self.model.fit(
+            training_data,
+            epochs=epochs,
+            steps_per_epoch=steps_per_epoch,
+            validation_data=validation_data,
+            validation_steps=validation_steps
+        )
