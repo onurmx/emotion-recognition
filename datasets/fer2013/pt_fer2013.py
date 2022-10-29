@@ -5,8 +5,9 @@ import torchvision
 import utils
 
 class FER2013(torch.utils.data.Dataset):
-    def __init__(self, df, transforms=None):
+    def __init__(self, df, cfg_OnsuNet = False, transforms=None):
         self.df = df
+        self.cfg_OnsuNet = cfg_OnsuNet
         self.transforms = transforms
         
     def __len__(self):
@@ -16,14 +17,15 @@ class FER2013(torch.utils.data.Dataset):
         row = self.df.loc[index]
         image, label = np.array([x.split() for x in self.df.loc[index, ['pixels']]]), row['emotion']
         image = np.asarray(image).astype(np.uint8).reshape(48,48)
-        image = np.stack((image,)*3, axis=-1)
+        if self.cfg_OnsuNet == False:
+            image = np.stack((image,)*3, axis=-1)
        
         if self.transforms:
             image = self.transforms(image)
             
         return image.clone().detach(), label
 
-def pt_load_fer2013(filepath, device, batch_size=64, stats=([0.5],[0.5])):
+def pt_load_fer2013(filepath, device, upsample = None, batch_size=64, stats=([0.5],[0.5]), cfg_OnsuNet = False):
     df = pd.read_csv(filepath)
 
     train_df = df[df['Usage']=='Training']
@@ -35,20 +37,20 @@ def pt_load_fer2013(filepath, device, batch_size=64, stats=([0.5],[0.5])):
 
     train_transformations = torchvision.transforms.Compose([   
         torchvision.transforms.ToPILImage(),
-        torchvision.transforms.Resize((224,224)),
+        torchvision.transforms.Resize((48 if upsample == None else upsample * 48, 48 if upsample == None else upsample * 48)),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize(*stats,inplace=True)
     ])
     valid_transformations = torchvision.transforms.Compose([
         torchvision.transforms.ToPILImage(),
-        torchvision.transforms.Resize((224,224)),
+        torchvision.transforms.Resize((48 if upsample == None else upsample * 48, 48 if upsample == None else upsample * 48)),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize(*stats,inplace=True)
     ])
 
-    train_ds = FER2013(train_df, train_transformations)
-    valid_ds = FER2013(valid_df, valid_transformations)
-    test_ds = FER2013(test_df, valid_transformations)
+    train_ds = FER2013(train_df, cfg_OnsuNet, train_transformations)
+    valid_ds = FER2013(valid_df, cfg_OnsuNet, valid_transformations)
+    test_ds = FER2013(test_df, cfg_OnsuNet, valid_transformations)
 
     train_dl = torch.utils.data.DataLoader(train_ds, batch_size, shuffle=True, num_workers=3, pin_memory=True)
     valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size*2, num_workers=2, pin_memory=True)
