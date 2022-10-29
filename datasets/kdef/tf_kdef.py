@@ -4,7 +4,7 @@ import os
 import sklearn.model_selection as skl
 import tensorflow as tf
 
-def tf_load_kdef(filepath, image_height=224, image_width=224, batch_size=64):
+def tf_load_kdef(filepath, image_height=224, image_width=224, batch_size=64, cfg_OnsuNet = False):
     labels = {'AN': 0, 'DI': 1, 'AF': 2, 'HA': 3, 'SA': 4, 'SU': 5, 'NE': 6}
 
     file_paths = []
@@ -14,12 +14,12 @@ def tf_load_kdef(filepath, image_height=224, image_width=224, batch_size=64):
                 file_paths.append(os.path.join(folder, filename))
 
     num_images = len(file_paths)
-    images = np.zeros(shape=(num_images, image_height, image_width, 3))
+    images = np.zeros(shape=(num_images, image_height, image_width, 3 if cfg_OnsuNet == False else 1))
     labels = np.zeros(shape=(num_images))
 
     for file_arg, file_path in enumerate(file_paths):
-        image = cv2.imread(file_path)
-        image = cv2.resize(image, (image_height, image_width))
+        image = cv2.imread(file_path, cv2.IMREAD_COLOR if cfg_OnsuNet == False else cv2.IMREAD_GRAYSCALE)
+        image = cv2.resize(image, (image_height, image_width)) if cfg_OnsuNet == False else cv2.resize(image, (image_height, image_width)).reshape(image_height, image_width, 1)
         images[file_arg] = image
         file_basename = os.path.basename(file_path)
         file_emotion = file_basename[4:6]
