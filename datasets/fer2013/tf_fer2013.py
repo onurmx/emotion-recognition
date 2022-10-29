@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-def tf_load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_size=64):
+def tf_load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_size=64, cfg_OnsuNet = False):
     df = pd.read_csv(filepath)
 
     x_train = df[df['Usage'] == 'Training']['pixels']
@@ -17,9 +17,9 @@ def tf_load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_siz
     x_val = np.array([np.fromstring(x, sep=' ') for x in x_val])
     x_test = np.array([np.fromstring(x, sep=' ') for x in x_test])
 
-    x_train = x_train.reshape(len(x_train), 48, 48)
-    x_val = x_val.reshape(len(x_val), 48, 48)
-    x_test = x_test.reshape(len(x_test), 48, 48)
+    x_train = x_train.reshape(len(x_train), 48, 48) if cfg_OnsuNet == False else x_train.reshape(len(x_train), 48, 48, 1)
+    x_val = x_val.reshape(len(x_val), 48, 48) if cfg_OnsuNet == False else x_val.reshape(len(x_val), 48, 48, 1)
+    x_test = x_test.reshape(len(x_test), 48, 48) if cfg_OnsuNet == False else x_test.reshape(len(x_test), 48, 48, 1)
 
     if convert_to_rgb:
         x_train = np.stack((x_train,)*3, axis=-1)
