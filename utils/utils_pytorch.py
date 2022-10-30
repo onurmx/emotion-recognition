@@ -41,23 +41,11 @@ def accuracy(outputs, labels):
     _, preds = torch.max(outputs, dim=1)
     return torch.tensor(torch.sum(preds == labels).item() / len(preds))
 
-def get_default_device():
-    return torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-def to_device(data, device):
-    if isinstance(data, (list,tuple)):
-        return [to_device(x, device) for x in data]
-    return data.to(device, non_blocking=True)
-
 @torch.no_grad()
 def evaluate(model, val_loader):
     model.eval()
     outputs = [model.validation_step(batch) for batch in val_loader]
     return model.validation_epoch_end(outputs)
-
-def get_lr(optimizer):
-    for param_group in optimizer.param_groups:
-        return param_group['lr']
 
 def fit_one_cycle(epochs, max_lr, model, train_loader, val_loader,
                   weight_decay=0, grad_clip=None, opt_func=torch.optim.SGD):
@@ -99,6 +87,12 @@ def fit_one_cycle(epochs, max_lr, model, train_loader, val_loader,
         history.append(result)
     return history
 
+def get_default_device():
+    return torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+def get_lr(optimizer):
+    for param_group in optimizer.param_groups:
+        return param_group['lr']
 
 def train_model(model, train_dl, valid_dl, epochs = 100, max_lr=0.001, grad_clip=0.2, weight_decay=1e-4, opt_func=torch.optim.Adam):
     history = fit_one_cycle(
@@ -113,3 +107,8 @@ def train_model(model, train_dl, valid_dl, epochs = 100, max_lr=0.001, grad_clip
     )
 
     return history
+
+def to_device(data, device):
+    if isinstance(data, (list,tuple)):
+        return [to_device(x, device) for x in data]
+    return data.to(device, non_blocking=True)
