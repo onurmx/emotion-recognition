@@ -55,7 +55,7 @@ class ResnetTensorFlow:
 
         return x
 
-    def build_model(self, input_shape=(224, 224, 3), num_classes=1000):
+    def build_model(self, input_shape=(224, 224, 3), num_classes=7):
         # get shape of input
         i = tf.keras.layers.Input(input_shape)
 

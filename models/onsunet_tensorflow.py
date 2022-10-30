@@ -2,8 +2,8 @@
 
 import tensorflow as tf
 
-class OnsuNetTensorFlow:
-    def build_model(self, num_classes=1000):
+class OnsunetTensorFlow:
+    def build_model(self, num_classes=7):
         # input
         i = tf.keras.layers.Input(shape=(48, 48, 1))
 
