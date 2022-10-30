@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-def tf_load_fer2013(filepath, convert_to_rgb = False, upsample = None, batch_size=64, cfg_OnsuNet = False):
+def load_fer2013_tensorflow(filepath, convert_to_rgb = True, upsample = None, batch_size=64, cfg_OnsuNet = False):
     df = pd.read_csv(filepath)
 
     x_train = df[df['Usage'] == 'Training']['pixels']

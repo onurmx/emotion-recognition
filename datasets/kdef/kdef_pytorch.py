@@ -4,9 +4,9 @@ import os
 import sklearn.model_selection as skl
 import torch
 import torchvision
-import utils
+from utils import utils_pytorch
 
-class KDEF(torch.utils.data.Dataset):
+class KDEFPyTorch(torch.utils.data.Dataset):
     def __init__(self, images, labels, transforms=None):
         self.images=images
         self.labels=labels
@@ -24,7 +24,7 @@ class KDEF(torch.utils.data.Dataset):
             image = self.transforms(image)
         return image, label
 
-def pt_load_kdef(filepath, device, image_height=224, image_width=224, batch_size=32, stats=([0.5],[0.5]), cfg_OnsuNet = False):
+def load_kdef_pytorch(filepath, device, image_height=224, image_width=224, batch_size=32, stats=([0.5],[0.5]), cfg_OnsuNet = False):
     labels = {'AN': 0, 'DI': 1, 'AF': 2, 'HA': 3, 'SA': 4, 'SU': 5, 'NE': 6}
 
     file_paths = []
@@ -62,9 +62,9 @@ def pt_load_kdef(filepath, device, image_height=224, image_width=224, batch_size
         torchvision.transforms.Normalize(*stats,inplace=True)
     ])
 
-    train_ds = KDEF(x_train, y_train, train_transformations)
-    valid_ds = KDEF(x_valid, y_valid,  valid_transformations)
-    test_ds = KDEF(x_test, y_test, valid_transformations)
+    train_ds = KDEFPyTorch(x_train, y_train, train_transformations)
+    valid_ds = KDEFPyTorch(x_valid, y_valid,  valid_transformations)
+    test_ds = KDEFPyTorch(x_test, y_test, valid_transformations)
 
     train_dl = torch.utils.data.DataLoader(train_ds, batch_size, shuffle=True, num_workers=3, pin_memory=True)
     valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size*2, num_workers=2, pin_memory=True)
@@ -72,8 +72,8 @@ def pt_load_kdef(filepath, device, image_height=224, image_width=224, batch_size
 
     torch.cuda.empty_cache()
 
-    train_dl = utils.DeviceDataLoader(train_dl, device)
-    valid_dl = utils.DeviceDataLoader(valid_dl, device)
-    test_dl = utils.DeviceDataLoader(test_dl, device)
+    train_dl = utils_pytorch.DeviceDataLoader(train_dl, device)
+    valid_dl = utils_pytorch.DeviceDataLoader(valid_dl, device)
+    test_dl = utils_pytorch.DeviceDataLoader(test_dl, device)
 
     return train_dl, valid_dl, test_dl
