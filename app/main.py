@@ -1,3 +1,4 @@
+from ctypes import alignment
 import sys
 from PySide2.QtCore import (
     QSize,
@@ -13,6 +14,10 @@ from PySide2.QtWidgets import (
     QPushButton,
     QStackedLayout,
     QStackedWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QGridLayout,
+    QLabel,
     QLayout,
     QWidget
 )
@@ -30,14 +35,26 @@ class PageTwo(QWidget):
         self.parent().setCurrentIndex(self.parent().currentIndex() - 1)
 
 
-class PageOne(QWidget):
+class WelcomePage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.layout = QStackedLayout()
-        self.setLayout(self.layout)
+        self.layout1 = QVBoxLayout()
+        self.layout2 = QHBoxLayout()
+        self.layout3 = QHBoxLayout()
+        self.layout1.addLayout(self.layout2)
+        self.layout1.addLayout(self.layout3)
+        self.setLayout(self.layout1)
+
+        self.label1 = QLabel("Welcome to the Emotify App!")
+        self.label1.setStyleSheet("font-size: 45px; font-weight: bold;")
+        self.label1.setAlignment(Qt.AlignCenter)
+        self.layout2.addWidget(self.label1)
+
         self.button = QPushButton("Next")
         self.button.clicked.connect(self.next_page)
-        self.layout.addWidget(self.button)
+        self.button.setStyleSheet("font-size: 20px;")
+        self.layout3.addWidget(self.button)
+        self.layout3.addWidget(self.button, alignment=Qt.AlignCenter)
 
     def next_page(self):
         self.parent().setCurrentIndex(self.parent().currentIndex() + 1)
@@ -51,10 +68,10 @@ class MainWindow(QMainWindow):
 
         self.stackedwidget = QStackedWidget()
 
-        self.page_one = PageOne(self)
+        self.welcome_page = WelcomePage(self)
         self.page_two = PageTwo(self)
 
-        self.stackedwidget.addWidget(self.page_one)
+        self.stackedwidget.addWidget(self.welcome_page)
         self.stackedwidget.addWidget(self.page_two)
 
         self.setCentralWidget(self.stackedwidget)
