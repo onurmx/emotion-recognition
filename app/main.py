@@ -1,4 +1,5 @@
 import sys
+import loadpage
 import trainorloadpage
 import welcomepage
 from PySide2.QtCore import (
@@ -35,9 +36,11 @@ class MainWindow(QMainWindow):
 
         self.welcome_page = welcomepage.WelcomePage(self)
         self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
+        self.load_page = loadpage.LoadPage(self)
 
         self.stackedwidget.addWidget(self.welcome_page)
         self.stackedwidget.addWidget(self.train_or_load_page)
+        self.stackedwidget.addWidget(self.load_page)
 
         self.setCentralWidget(self.stackedwidget)
 

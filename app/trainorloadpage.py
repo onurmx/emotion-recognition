@@ -27,6 +27,7 @@ class TrainOrLoadPage(QWidget):
         self.train_layout.addWidget(self.button1, alignment=Qt.AlignCenter)
 
         self.button2 = QPushButton("Load Model")
+        self.button2.clicked.connect(self.load_page)
         self.button2.setStyleSheet("font-size: 20px;")
         self.button2.setFixedSize(200, 100)
         self.load_layout.addWidget(self.button2, alignment=Qt.AlignCenter)
@@ -36,6 +37,9 @@ class TrainOrLoadPage(QWidget):
         self.button3.setStyleSheet("font-size: 20px;")
         self.button3.setFixedSize(100, 50)
         self.back_layout.addWidget(self.button3, alignment=Qt.AlignCenter)
+
+    def load_page(self):
+        self.parent().setCurrentIndex(2)
 
     def back_page(self):
         self.parent().setCurrentIndex(0)
