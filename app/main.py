@@ -32,18 +32,18 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Emotify")
         self.setFixedSize(QSize(950, 700))
 
-        self.stackedwidget = QStackedWidget()
-
         self.welcome_page = welcomepage.WelcomePage(self)
-        self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
-        self.load_page = loadpage.LoadPage(self)
+        # self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
+        # self.load_page = loadpage.LoadPage(self)
+        self.show_page(self.welcome_page)
 
-        self.stackedwidget.addWidget(self.welcome_page)
-        self.stackedwidget.addWidget(self.train_or_load_page)
-        self.stackedwidget.addWidget(self.load_page)
+    def show_page(self, page):
+        self.setCentralWidget(page)
+        page.show()
 
-        self.setCentralWidget(self.stackedwidget)
-
+    def hide_page(self, page):
+        page.hide()
+        self.setCentralWidget(None)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
