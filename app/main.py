@@ -1,5 +1,5 @@
 import sys
-import loadpage
+import loadmodelpage
 import trainorloadpage
 import welcomepage
 from PySide2.QtCore import (
@@ -33,17 +33,15 @@ class MainWindow(QMainWindow):
         self.setFixedSize(QSize(950, 700))
 
         self.welcome_page = welcomepage.WelcomePage(self)
-        # self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
-        # self.load_page = loadpage.LoadPage(self)
+        self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
+        self.load_model_page = loadmodelpage.LoadModelPage(self)
+        
         self.show_page(self.welcome_page)
 
     def show_page(self, page):
+        if self.centralWidget() is not None:
+            self.centralWidget().setParent(None)
         self.setCentralWidget(page)
-        page.show()
-
-    def hide_page(self, page):
-        page.hide()
-        self.setCentralWidget(None)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -36,8 +36,8 @@ class WelcomePage(QWidget):
         self.button.setParent(self)
         self.button.setFixedSize(QSize(200, 100))
         self.button.move(QPoint(self.parent().size().width() / 2 - self.button.size().width() / 2, 475))
-        # self.button.clicked.connect(self.next_page)
+        self.button.clicked.connect(self.next_page)
         self.button.setStyleSheet("font-size: 20px;")
 
-    # def next_page(self):
-    #     self.parent().hide_page(self)
+    def next_page(self):
+        self.parent().show_page(self.parent().train_or_load_page)
