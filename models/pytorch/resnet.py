@@ -1,11 +1,10 @@
 # Resnet general implementation in PyTorch
 
 import torch
-from utils import utils_pytorch
 
-class ResidualBlockPyTorch(torch.nn.Module):
+class ResidualBlock(torch.nn.Module):
     def __init__(self, in_channels, out_channels, stride=1, downsample=None):
-        super(ResidualBlockPyTorch, self).__init__()
+        super(ResidualBlock, self).__init__()
         self.conv1 = torch.nn.Sequential(
             torch.nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1),
             torch.nn.BatchNorm2d(out_channels),
@@ -30,9 +29,9 @@ class ResidualBlockPyTorch(torch.nn.Module):
         return out
 
 
-class ResnetPyTorch(utils_pytorch.ImageClassificationBase):
+class Resnet(torch.nn.Module):
     def __init__(self, block, layers, num_classes):
-        super(ResnetPyTorch, self).__init__()
+        super(Resnet, self).__init__()
         self.inplanes = 64
         self.conv1 = torch.nn.Sequential(
             torch.nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
@@ -75,5 +74,5 @@ class ResnetPyTorch(utils_pytorch.ImageClassificationBase):
 
         return x
 
-def get_resnet50_pytorch(num_classes=7):
-    return ResnetPyTorch(ResidualBlockPyTorch, [3, 4, 6, 3], num_classes)
+def Resnet50(num_classes=7):
+    return Resnet(ResidualBlock, [3, 4, 6, 3], num_classes)

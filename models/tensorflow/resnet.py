@@ -2,7 +2,7 @@
 
 import tensorflow as tf
 
-class ResnetTensorFlow:
+class Resnet:
     def identity_block(self, input, filter_size, filters):
         f1, f2, f3 = filters
         bn_axis = 3

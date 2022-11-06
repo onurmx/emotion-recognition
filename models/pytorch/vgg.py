@@ -1,11 +1,10 @@
 # VGG-16 implementation in PyTorch
 
 import torch
-from utils import utils_pytorch
 
-class VGG16PyTorch(utils_pytorch.ImageClassificationBase):
+class VGG16(torch.nn.Module):
     def __init__(self, num_classes):
-        super(VGG16PyTorch, self).__init__()
+        super(VGG16, self).__init__()
 
         # block 1
         self.layer1 = torch.nn.Sequential(
@@ -105,14 +104,12 @@ class VGG16PyTorch(utils_pytorch.ImageClassificationBase):
 
         # block 14
         self.fc = torch.nn.Sequential(
-            torch.nn.Dropout(p=0.5),
             torch.nn.Linear(in_features=7*7*512, out_features=4096),
             torch.nn.ReLU()
         )
 
         # block 15
         self.fc1 = torch.nn.Sequential(
-            torch.nn.Dropout(p=0.5),
             torch.nn.Linear(in_features=4096, out_features=4096),
             torch.nn.ReLU()
         )
@@ -141,6 +138,3 @@ class VGG16PyTorch(utils_pytorch.ImageClassificationBase):
         out = self.fc1(out)
         out = self.fc2(out)
         return out
-
-def get_vgg16_pytorch(num_classes=7):
-    return VGG16PyTorch(num_classes)

@@ -1,11 +1,10 @@
 # Onsunet implementation in PyTorch
 
 import torch
-from utils import utils_pytorch
 
-class OnsunetPyTorch(utils_pytorch.ImageClassificationBase):
+class Onsunet(torch.nn.Module):
     def __init__(self, num_classes):
-        super(OnsunetPyTorch, self).__init__()
+        super(Onsunet, self).__init__()
         # block 1
         self.conv1 = torch.nn.Conv2d(in_channels=1, out_channels=256, kernel_size=3, padding=1)
         self.conv2 = torch.nn.Conv2d(in_channels=256, out_channels=512, kernel_size=3, padding=1)
@@ -75,6 +74,3 @@ class OnsunetPyTorch(utils_pytorch.ImageClassificationBase):
         out = self.fc2(out)
 
         return out
-
-def get_onsunet_pytorch(num_classes=7):
-    return OnsunetPyTorch(num_classes)

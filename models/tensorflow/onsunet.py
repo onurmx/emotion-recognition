@@ -1,8 +1,8 @@
-# ResNet-50 implementation in TensorFlow
+# Onsunet implementation in TensorFlow
 
 import tensorflow as tf
 
-class OnsunetTensorFlow:
+class Onsunet:
     def build_model(self, num_classes=7):
         # input
         i = tf.keras.layers.Input(shape=(48, 48, 1))
