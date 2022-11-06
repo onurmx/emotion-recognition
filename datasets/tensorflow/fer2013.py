@@ -1,8 +1,9 @@
+import cv2
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-def load_fer2013(filepath, upsample = None, batch_size=64, cfg_OnsuNet = False):
+def load_fer2013(filepath, size, batch_size=64, cfg_OnsuNet = False):
     df = pd.read_csv(filepath)
 
     x_train = df[df['Usage'] == 'Training']['pixels']
@@ -21,15 +22,14 @@ def load_fer2013(filepath, upsample = None, batch_size=64, cfg_OnsuNet = False):
     x_val = x_val.reshape(len(x_val), 48, 48) if cfg_OnsuNet == False else x_val.reshape(len(x_val), 48, 48, 1)
     x_test = x_test.reshape(len(x_test), 48, 48) if cfg_OnsuNet == False else x_test.reshape(len(x_test), 48, 48, 1)
 
-    if cfg_OnsuNet:
+    if cfg_OnsuNet == False: # means convert to 3-channel image
         x_train = np.stack((x_train,)*3, axis=-1)
         x_val = np.stack((x_val,)*3, axis=-1)
         x_test = np.stack((x_test,)*3, axis=-1)
 
-    if upsample:
-        x_train = np.array([x.repeat(upsample, axis=0).repeat(upsample, axis=1) for x in x_train])
-        x_val = np.array([x.repeat(upsample, axis=0).repeat(upsample, axis=1) for x in x_val])
-        x_test = np.array([x.repeat(upsample, axis=0).repeat(upsample, axis=1) for x in x_test])
+    x_train = np.array([cv2.resize(x, (size, size)) for x in x_train])
+    x_val = np.array([cv2.resize(x, (size, size)) for x in x_val])
+    x_test = np.array([cv2.resize(x, (size, size)) for x in x_test])
 
     steps_per_epoch = len(x_train) // batch_size
     validation_steps = len(x_val) // batch_size
