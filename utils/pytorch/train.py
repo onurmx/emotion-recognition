@@ -35,11 +35,11 @@ def get_lr(optimizer):
 def logger(epoch, lrs, train_loss, val_loss, val_acc):
     print("Epoch [{}]: last_learning_rate: {:.5f}, train_loss: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}".format(epoch, lrs, train_loss, val_loss, val_acc))
 
-def fit(epochs, lr, model, train_loader, val_loader, weight_decay=0, opt_func=torch.optim.Adam):
+def fit(epochs, lr, model, train_loader, val_loader, factor=0.5, patience=5, weight_decay=0, opt_func=torch.optim.Adam):
     torch.cuda.empty_cache()
 
     optimizer = opt_func(model.parameters(), lr, weight_decay=weight_decay)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.50, patience=5, verbose=False)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=factor, patience=patience, verbose=False)
 
     for epoch in range(epochs):
         model.train()
