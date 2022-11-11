@@ -27,22 +27,23 @@ def load_fer2013(filepath, size, batch_size=64, cfg_OnsuNet = False):
         x_val = np.stack((x_val,)*3, axis=-1)
         x_test = np.stack((x_test,)*3, axis=-1)
 
-    x_train = np.array([cv2.resize(x, (size, size)) for x in x_train])
-    x_val = np.array([cv2.resize(x, (size, size)) for x in x_val])
-    x_test = np.array([cv2.resize(x, (size, size)) for x in x_test])
+    if cfg_OnsuNet == False: # resize image
+        x_train = np.array([cv2.resize(x, (size, size)) for x in x_train])
+        x_val = np.array([cv2.resize(x, (size, size)) for x in x_val])
+        x_test = np.array([cv2.resize(x, (size, size)) for x in x_test])
 
     steps_per_epoch = len(x_train) // batch_size
     validation_steps = len(x_val) // batch_size
     test_steps = len(x_test) // batch_size
 
     train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        vertical_flip=True,
+        rotation_range=30,
+        # width_shift_range=0.2,
+        # height_shift_range=0.2,
+        # shear_range=0.2,
+        # zoom_range=0.2,
+        # horizontal_flip=True,
+        # vertical_flip=True,
         rescale=1. / 255
     )
 

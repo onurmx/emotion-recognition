@@ -50,11 +50,12 @@ class VGG16:
             metrics=metrics
         )
 
-    def train_model(self, training_data, validation_data, epochs, steps_per_epoch, validation_steps):
+    def train_model(self, training_data, validation_data, epochs, steps_per_epoch, validation_steps, callbacks):
         self.model.fit(
             training_data,
             epochs=epochs,
             steps_per_epoch=steps_per_epoch,
             validation_data=validation_data,
-            validation_steps=validation_steps
+            validation_steps=validation_steps,
+            callbacks=callbacks
         )
