@@ -36,13 +36,13 @@ def load_kdef(filepath, size, batch_size=64, cfg_OnsuNet = False):
     test_steps = len(x_test) // batch_size
 
     train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        vertical_flip=True,
+        rotation_range=30,
+        # width_shift_range=0.2,
+        # height_shift_range=0.2,
+        # shear_range=0.2,
+        # zoom_range=0.2,
+        # horizontal_flip=True,
+        # vertical_flip=True,
         rescale=1. / 255
     )
 
