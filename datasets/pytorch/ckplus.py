@@ -62,9 +62,9 @@ def load_ckplus(filepath, device, size, batch_size=64, cfg_OnsuNet = False):
     valid_ds = CKPLUS(x_valid, y_valid,  valid_transformations)
     test_ds = CKPLUS(x_test, y_test, valid_transformations)
 
-    train_dl = torch.utils.data.DataLoader(train_ds, batch_size, shuffle=True, num_workers=3, pin_memory=True)
-    valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size, num_workers=2, pin_memory=True)
-    test_dl = torch.utils.data.DataLoader(test_ds, batch_size, num_workers=2, pin_memory=True)
+    train_dl = torch.utils.data.DataLoader(train_ds, batch_size, shuffle=True, num_workers=2)
+    valid_dl = torch.utils.data.DataLoader(valid_ds, batch_size, shuffle=True, num_workers=2)
+    test_dl = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=True, num_workers=2)
 
     torch.cuda.empty_cache()
 
