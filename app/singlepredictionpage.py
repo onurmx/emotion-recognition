@@ -1,3 +1,6 @@
+import cv2
+import app_utils as au
+
 from PySide2.QtCore import (
     QSize,
     Qt,
@@ -6,7 +9,8 @@ from PySide2.QtCore import (
 from PySide2.QtGui import (
     QColor,
     QPalette,
-    QPixmap
+    QPixmap,
+    QImage
 )
 from PySide2.QtWidgets import (
     QApplication,
@@ -67,4 +71,18 @@ class SinglePredictionPage(QWidget):
             self.picturebox.setAlignment(Qt.AlignCenter)
 
     def predict(self):
-        return NotImplementedError
+        image = cv2.imread(self.filename)
+        face_cascade = cv2.CascadeClassifier("C:/Users/Onur/Desktop/workbench/haarcascade_frontalface_default.xml")
+        image_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(image_grayscaled, 1.3, 5)
+
+        # cropped_images = []
+        # for (x, y, w, h) in faces:
+        #     cropped_images.append(image[y:y+h, x:x+w])
+        
+        for (x, y, w, h) in faces:
+            image = cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 3)
+
+        image = au.image_to_pixmap(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        self.picturebox.setPixmap(image.scaled(self.picturebox.size(), Qt.KeepAspectRatio))
+        self.picturebox.setAlignment(Qt.AlignCenter)
