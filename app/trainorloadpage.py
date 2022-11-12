@@ -42,12 +42,12 @@ class TrainOrLoadPage(QWidget):
         self.button3 = QPushButton("Back")
         self.button3.setParent(self)
         self.button3.setFixedSize(200, 100)
-        self.button3.move(QPoint(2 * self.parent().size().width() / 4 - self.button3.size().width() / 2, 400))
+        self.button3.move(QPoint(2 * self.parent().size().width() / 4 - self.button3.size().width() / 2, 475))
         self.button3.clicked.connect(self.back_page)
         self.button3.setStyleSheet("font-size: 20px;")
 
     def train_page(self):
-        return NotImplementedError
+        self.parent().show_page(self.parent().train_model_page)
 
     def load_page(self):
         self.parent().show_page(self.parent().load_model_page)

@@ -1,6 +1,7 @@
 import sys
 import loadmodelpage
 import trainorloadpage
+import trainmodelpage
 import welcomepage
 import singleormasspredictionpage
 import singlepredictionpage
@@ -37,6 +38,7 @@ class MainWindow(QMainWindow):
 
         self.welcome_page = welcomepage.WelcomePage(self)
         self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
+        self.train_model_page = trainmodelpage.TrainModelPage(self)
         self.load_model_page = loadmodelpage.LoadModelPage(self)
         self.single_or_mass_prediction_page = singleormasspredictionpage.SingleOrMassPredictionPage(self)
         self.single_prediction_page = singlepredictionpage.SinglePredictionPage(self)

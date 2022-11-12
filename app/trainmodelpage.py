@@ -22,14 +22,14 @@ from PySide2.QtWidgets import (
     QComboBox
 )
 
-class LoadModelPage(QWidget):
+class TrainModelPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.backend_combobox = QComboBox()
         self.backend_combobox.setParent(self)
         self.backend_combobox.setFixedSize(QSize(200, 50))
-        self.backend_combobox.move(QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2, 130))
+        self.backend_combobox.move(QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2, 100))
         self.backend_combobox.setStyleSheet("font-size: 20px;")
         self.backend_combobox.addItem("Tensorflow")
         self.backend_combobox.addItem("PyTorch")
@@ -39,7 +39,7 @@ class LoadModelPage(QWidget):
         self.backend_label.setFixedSize(QSize(400, 50))
         self.backend_label.move(
             QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2 - self.backend_label.size().width() - 10,
-                   142
+                   112
                    )
         )
         self.backend_label.setStyleSheet("font-size: 20px;")
@@ -48,7 +48,7 @@ class LoadModelPage(QWidget):
         self.model_combobox = QComboBox()
         self.model_combobox.setParent(self)
         self.model_combobox.setFixedSize(QSize(200, 50))
-        self.model_combobox.move(QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2, 230))
+        self.model_combobox.move(QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2, 200))
         self.model_combobox.setStyleSheet("font-size: 20px;")
         self.model_combobox.addItem("ResNet")
         self.model_combobox.addItem("VGG")
@@ -59,7 +59,7 @@ class LoadModelPage(QWidget):
         self.model_label.setFixedSize(QSize(400, 50))
         self.model_label.move(
             QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2 - self.model_label.size().width() - 10,
-                   242
+                   212
                    )
         )
         self.model_label.setStyleSheet("font-size: 20px;")
@@ -68,7 +68,7 @@ class LoadModelPage(QWidget):
         self.dataset_combobox = QComboBox()
         self.dataset_combobox.setParent(self)
         self.dataset_combobox.setFixedSize(QSize(200, 50))
-        self.dataset_combobox.move(QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2, 330))
+        self.dataset_combobox.move(QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2, 300))
         self.dataset_combobox.setStyleSheet("font-size: 20px;")
         self.dataset_combobox.addItem("FER2013")
         self.dataset_combobox.addItem("CK+")
@@ -79,7 +79,7 @@ class LoadModelPage(QWidget):
         self.dataset_label.setFixedSize(QSize(400, 50))
         self.dataset_label.move(
             QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2 - self.dataset_label.size().width() - 10,
-                   342
+                   312
                    )
         )
         self.dataset_label.setStyleSheet("font-size: 20px;")
@@ -88,14 +88,14 @@ class LoadModelPage(QWidget):
         self.button_back = QPushButton("Back")
         self.button_back.setParent(self)
         self.button_back.setFixedSize(200, 100)
-        self.button_back.move(QPoint(self.parent().size().width() / 3 - self.button_back.size().width() / 2, 475))
+        self.button_back.move(QPoint(self.parent().size().width() / 3 - self.button_back.size().width() / 2, 400))
         self.button_back.clicked.connect(self.back_page)
         self.button_back.setStyleSheet("font-size: 20px;")
 
         self.button_next = QPushButton("Next")
         self.button_next.setParent(self)
         self.button_next.setFixedSize(200, 100)
-        self.button_next.move(QPoint(2 * self.parent().size().width() / 3 - self.button_next.size().width() / 2, 475))
+        self.button_next.move(QPoint(2 * self.parent().size().width() / 3 - self.button_next.size().width() / 2, 400))
         self.button_next.clicked.connect(self.next_page)
         self.button_next.setStyleSheet("font-size: 20px;")
     
@@ -103,4 +103,4 @@ class LoadModelPage(QWidget):
         self.parent().show_page(self.parent().train_or_load_page)
 
     def next_page(self):
-        self.parent().show_page(self.parent().single_or_mass_prediction_page)
+        return NotImplementedError
