@@ -103,4 +103,4 @@ class LoadModelPage(QWidget):
         self.parent().show_page(self.parent().train_or_load_page)
 
     def next_page(self):
-        return NotImplementedError
+        self.parent().show_page(self.parent().single_or_mass_prediction_page)

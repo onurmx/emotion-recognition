@@ -2,6 +2,9 @@ import sys
 import loadmodelpage
 import trainorloadpage
 import welcomepage
+import singleormasspredictionpage
+import singlepredictionpage
+
 from PySide2.QtCore import (
     QSize,
     Qt
@@ -35,6 +38,8 @@ class MainWindow(QMainWindow):
         self.welcome_page = welcomepage.WelcomePage(self)
         self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
         self.load_model_page = loadmodelpage.LoadModelPage(self)
+        self.single_or_mass_prediction_page = singleormasspredictionpage.SingleOrMassPredictionPage(self)
+        self.single_prediction_page = singlepredictionpage.SinglePredictionPage(self)
         
         self.show_page(self.welcome_page)
 
