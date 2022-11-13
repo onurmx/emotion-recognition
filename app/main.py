@@ -1,10 +1,10 @@
 import sys
-import loadmodelpage
-import trainorloadpage
-import trainmodelpage
-import welcomepage
-import singleormasspredictionpage
-import singlepredictionpage
+import pages.loadmodelpage
+import pages.trainorloadpage
+import pages.trainmodelpage
+import pages.welcomepage
+import pages.singleormasspredictionpage
+import pages.singlepredictionpage
 
 from PySide2.QtCore import (
     QSize,
@@ -36,12 +36,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Emotify")
         self.setFixedSize(QSize(950, 700))
 
-        self.welcome_page = welcomepage.WelcomePage(self)
-        self.train_or_load_page = trainorloadpage.TrainOrLoadPage(self)
-        self.train_model_page = trainmodelpage.TrainModelPage(self)
-        self.load_model_page = loadmodelpage.LoadModelPage(self)
-        self.single_or_mass_prediction_page = singleormasspredictionpage.SingleOrMassPredictionPage(self)
-        self.single_prediction_page = singlepredictionpage.SinglePredictionPage(self)
+        self.welcome_page = pages.welcomepage.WelcomePage(self)
+        self.train_or_load_page = pages.trainorloadpage.TrainOrLoadPage(self)
+        self.train_model_page = pages.trainmodelpage.TrainModelPage(self)
+        self.load_model_page = pages.loadmodelpage.LoadModelPage(self)
+        self.single_or_mass_prediction_page = pages.singleormasspredictionpage.SingleOrMassPredictionPage(self)
+        self.single_prediction_page = pages.singlepredictionpage.SinglePredictionPage(self)
         
         self.show_page(self.welcome_page)
 
