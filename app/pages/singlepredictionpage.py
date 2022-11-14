@@ -72,16 +72,19 @@ class SinglePredictionPage(QWidget):
 
     def predict(self):
         image = cv2.imread(self.filename)
-        face_cascade = cv2.CascadeClassifier("C:/Users/Onur/Desktop/workbench/haarcascade_frontalface_default.xml")
-        image_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(image_grayscaled, 1.3, 5)
-
-        # cropped_images = []
-        # for (x, y, w, h) in faces:
-        #     cropped_images.append(image[y:y+h, x:x+w])
+        faces = au.get_faces(image, self.parent().workdir)
+        if len(faces) > 0:
+            backend = self.parent().load_model_page.backend_combobox.currentText()
+            model = self.parent().load_model_page.model_combobox.currentText()
+            dataset = self.parent().load_model_page.dataset_combobox.currentText()
+            workdir = self.parent().workdir
+            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, dataset, workdir) for (x, y, w, h) in faces]
         
+        i=0
         for (x, y, w, h) in faces:
-            image = cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 3)
+            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 255), 2)
+            cv2.putText(image, emotions[i], (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+            i+=1
 
         image = au.image_to_pixmap(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         self.picturebox.setPixmap(image.scaled(self.picturebox.size(), Qt.KeepAspectRatio))

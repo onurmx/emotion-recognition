@@ -50,9 +50,9 @@ class LoadModelPage(QWidget):
         self.model_combobox.setFixedSize(QSize(200, 50))
         self.model_combobox.move(QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2, 230))
         self.model_combobox.setStyleSheet("font-size: 20px;")
-        self.model_combobox.addItem("ResNet")
+        self.model_combobox.addItem("Resnet")
         self.model_combobox.addItem("VGG")
-        self.model_combobox.addItem("OnsuNet")
+        self.model_combobox.addItem("Onsunet")
 
         self.model_label = QLabel("Model:")
         self.model_label.setParent(self)

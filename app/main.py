@@ -1,4 +1,7 @@
 import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pages.loadmodelpage
 import pages.trainorloadpage
 import pages.trainmodelpage
@@ -43,6 +46,8 @@ class MainWindow(QMainWindow):
         self.single_or_mass_prediction_page = pages.singleormasspredictionpage.SingleOrMassPredictionPage(self)
         self.single_prediction_page = pages.singlepredictionpage.SinglePredictionPage(self)
         
+        self.workdir = "D:/emo/appfiles"
+
         self.show_page(self.welcome_page)
 
     def show_page(self, page):
