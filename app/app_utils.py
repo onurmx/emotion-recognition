@@ -1,4 +1,5 @@
 import cv2
+import tensorflow as tf
 import torch
 import torchvision
 
@@ -35,53 +36,28 @@ def get_faces(image, workdir):
 
 def prediction_generator(image, backend, model, dataset, workdir):
     if backend == "Tensorflow":
-        if model == "Resnet":
-            if dataset == "FER2013":
-                return NotImplementedError
-            elif dataset == "CK+":
-                return NotImplementedError
-            elif dataset == "KDEF": 
-                return NotImplementedError
-        elif model == "VGG":
-            if dataset == "FER2013":
-                return NotImplementedError
-            elif dataset == "CK+":
-                return NotImplementedError
-            elif dataset == "KDEF": 
-                return NotImplementedError
-        elif model == "Onsunet":
-            if dataset == "FER2013":
-                return NotImplementedError
-            elif dataset == "CK+":
-                return NotImplementedError
-            elif dataset == "KDEF": 
-                return NotImplementedError
+        target_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if model != "Onsunet" else cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        target_image = cv2.resize(target_image, (224, 224)) if model != "Onsunet" else cv2.resize(target_image, (48, 48))
+        target_image = target_image.reshape(1,224,224,3) if model != "Onsunet" else target_image.reshape(1,48,48,1)
+        net = tf.keras.models.load_model(workdir + "/trained_models/tensorflow/" + model.lower() + "/" + dataset.lower() + "/model.h5")
+        predictions = net.predict(target_image)
+        return fer2013_label_translator(tf.argmax(predictions[0]).numpy())
     elif backend == "PyTorch":
-        if model=="Resnet" or model == "VGG":
-            target_image = cv2.resize(image, (224, 224))
-            target_image = torchvision.transforms.ToPILImage()(target_image)
-            target_image = torchvision.transforms.ToTensor()(target_image)
-            model = resnet_pytorch.resnet50(img_channels=3, num_classes=7) if model=="Resnet" else vgg_pytorch.VGG16(num_classes=7)
-            if dataset == "FER2013":
-                model.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + ("resnet" if model == "Resnet" else "vgg") + "/fer2013/model.pt", map_location=torch.device('cpu')))
-            elif dataset == "CK+":
-                model.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + ("resnet" if model == "Resnet" else "vgg") + "/fer2013/model.pt", map_location=torch.device('cpu')))
-            elif dataset == "KDEF": 
-                model.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + ("resnet" if model == "Resnet" else "vgg") + "/fer2013/model.pt", map_location=torch.device('cpu')))
-        elif model == "Onsunet":
-            target_image = cv2.resize(image, (48, 48))
-            target_image = torchvision.transforms.ToPILImage()(target_image)
+        target_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        target_image = cv2.resize(target_image, (224, 224)) if model != "Onsunet" else cv2.resize(target_image, (48, 48))
+        target_image = torchvision.transforms.ToPILImage()(target_image)
+        if model == "Onsunet":
             target_image = torchvision.transforms.Grayscale(num_output_channels=1)(target_image)
-            target_image = torchvision.transforms.ToTensor()(target_image)
-            model = onsunet_pytorch.Onsunet(num_classes=7)
-            if dataset == "FER2013":
-                model.load_state_dict(torch.load(workdir + "/trained_models/pytorch/onsunet/fer2013/model.pt", map_location=torch.device('cpu')))
-            elif dataset == "CK+":
-                model.load_state_dict(torch.load(workdir + "/trained_models/pytorch/onsunet/fer2013/model.pt", map_location=torch.device('cpu')))
-            elif dataset == "KDEF": 
-                model.load_state_dict(torch.load(workdir + "/trained_models/pytorch/onsunet/fer2013/model.pt", map_location=torch.device('cpu')))
-        model.eval()
-        prediction = model(target_image.unsqueeze(0))
+        target_image = torchvision.transforms.ToTensor()(target_image)
+        if model == "Resnet":
+            net = resnet_pytorch.resnet50(img_channels=3, num_classes=7)
+        elif model == "VGG":
+            net = vgg_pytorch.VGG16(num_classes=7)
+        elif model == "Onsunet":
+            net = onsunet_pytorch.Onsunet(num_classes=7)
+        net.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + model.lower() + "/" + dataset.lower() + "/model.pt", map_location=torch.device('cpu')))
+        net.eval()
+        prediction = net(target_image.unsqueeze(0))
         emotion_label = torch.argmax(prediction)
         emotion_label = emotion_label.item()
         emotion_label = fer2013_label_translator(emotion_label)
