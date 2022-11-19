@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import app_utils as au
 import pages.loadmodelpage
 import pages.trainorloadpage
 import pages.trainmodelpage
@@ -39,6 +40,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Emotify")
         self.setFixedSize(QSize(950, 700))
 
+        self.workdir = "D:/emo/appfiles"
+
         self.welcome_page = pages.welcomepage.WelcomePage(self)
         self.train_or_load_page = pages.trainorloadpage.TrainOrLoadPage(self)
         self.train_model_page = pages.trainmodelpage.TrainModelPage(self)
@@ -46,14 +49,14 @@ class MainWindow(QMainWindow):
         self.single_or_mass_prediction_page = pages.singleormasspredictionpage.SingleOrMassPredictionPage(self)
         self.single_prediction_page = pages.singlepredictionpage.SinglePredictionPage(self)
         
-        self.workdir = "D:/emo/appfiles"
-
+        sys.stdout = au.OutLog(self.train_model_page.log_screen)
         self.show_page(self.welcome_page)
 
     def show_page(self, page):
         if self.centralWidget() is not None:
             self.centralWidget().setParent(None)
         self.setCentralWidget(page)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

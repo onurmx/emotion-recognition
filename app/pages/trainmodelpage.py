@@ -19,84 +19,109 @@ from PySide2.QtWidgets import (
     QLabel,
     QLayout,
     QWidget,
-    QComboBox
+    QComboBox,
+    QPlainTextEdit
 )
 
 class TrainModelPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.backend_combobox = QComboBox()
-        self.backend_combobox.setParent(self)
-        self.backend_combobox.setFixedSize(QSize(200, 50))
-        self.backend_combobox.move(QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2, 100))
-        self.backend_combobox.setStyleSheet("font-size: 20px;")
-        self.backend_combobox.addItem("Tensorflow")
-        self.backend_combobox.addItem("PyTorch")
+        # self.backend_combobox = QComboBox()
+        # self.backend_combobox.setParent(self)
+        # self.backend_combobox.setFixedSize(QSize(200, 50))
+        # self.backend_combobox.move(QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2, 100))
+        # self.backend_combobox.setStyleSheet("font-size: 20px;")
+        # self.backend_combobox.addItem("Tensorflow")
+        # self.backend_combobox.addItem("PyTorch")
 
-        self.backend_label = QLabel("Backend:")
-        self.backend_label.setParent(self)
-        self.backend_label.setFixedSize(QSize(400, 50))
-        self.backend_label.move(
-            QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2 - self.backend_label.size().width() - 10,
-                   112
-                   )
-        )
-        self.backend_label.setStyleSheet("font-size: 20px;")
-        self.backend_label.setAlignment(Qt.AlignRight)
+        # self.backend_label = QLabel("Backend:")
+        # self.backend_label.setParent(self)
+        # self.backend_label.setFixedSize(QSize(400, 50))
+        # self.backend_label.move(
+        #     QPoint(self.parent().size().width() / 2 - self.backend_combobox.size().width() / 2 - self.backend_label.size().width() - 10,
+        #            112
+        #            )
+        # )
+        # self.backend_label.setStyleSheet("font-size: 20px;")
+        # self.backend_label.setAlignment(Qt.AlignRight)
 
-        self.model_combobox = QComboBox()
-        self.model_combobox.setParent(self)
-        self.model_combobox.setFixedSize(QSize(200, 50))
-        self.model_combobox.move(QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2, 200))
-        self.model_combobox.setStyleSheet("font-size: 20px;")
-        self.model_combobox.addItem("ResNet")
-        self.model_combobox.addItem("VGG")
-        self.model_combobox.addItem("OnsuNet")
+        # self.model_combobox = QComboBox()
+        # self.model_combobox.setParent(self)
+        # self.model_combobox.setFixedSize(QSize(200, 50))
+        # self.model_combobox.move(QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2, 200))
+        # self.model_combobox.setStyleSheet("font-size: 20px;")
+        # self.model_combobox.addItem("ResNet")
+        # self.model_combobox.addItem("VGG")
+        # self.model_combobox.addItem("OnsuNet")
 
-        self.model_label = QLabel("Model:")
-        self.model_label.setParent(self)
-        self.model_label.setFixedSize(QSize(400, 50))
-        self.model_label.move(
-            QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2 - self.model_label.size().width() - 10,
-                   212
-                   )
-        )
-        self.model_label.setStyleSheet("font-size: 20px;")
-        self.model_label.setAlignment(Qt.AlignRight)
+        # self.model_label = QLabel("Model:")
+        # self.model_label.setParent(self)
+        # self.model_label.setFixedSize(QSize(400, 50))
+        # self.model_label.move(
+        #     QPoint(self.parent().size().width() / 2 - self.model_combobox.size().width() / 2 - self.model_label.size().width() - 10,
+        #            212
+        #            )
+        # )
+        # self.model_label.setStyleSheet("font-size: 20px;")
+        # self.model_label.setAlignment(Qt.AlignRight)
 
-        self.dataset_combobox = QComboBox()
-        self.dataset_combobox.setParent(self)
-        self.dataset_combobox.setFixedSize(QSize(200, 50))
-        self.dataset_combobox.move(QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2, 300))
-        self.dataset_combobox.setStyleSheet("font-size: 20px;")
-        self.dataset_combobox.addItem("FER2013")
-        self.dataset_combobox.addItem("CK+")
-        self.dataset_combobox.addItem("KDEF")
+        # self.dataset_combobox = QComboBox()
+        # self.dataset_combobox.setParent(self)
+        # self.dataset_combobox.setFixedSize(QSize(200, 50))
+        # self.dataset_combobox.move(QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2, 300))
+        # self.dataset_combobox.setStyleSheet("font-size: 20px;")
+        # self.dataset_combobox.addItem("FER2013")
+        # self.dataset_combobox.addItem("CK+")
+        # self.dataset_combobox.addItem("KDEF")
 
-        self.dataset_label = QLabel("Dataset:")
-        self.dataset_label.setParent(self)
-        self.dataset_label.setFixedSize(QSize(400, 50))
-        self.dataset_label.move(
-            QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2 - self.dataset_label.size().width() - 10,
-                   312
-                   )
-        )
-        self.dataset_label.setStyleSheet("font-size: 20px;")
-        self.dataset_label.setAlignment(Qt.AlignRight)
+        # self.dataset_label = QLabel("Dataset:")
+        # self.dataset_label.setParent(self)
+        # self.dataset_label.setFixedSize(QSize(400, 50))
+        # self.dataset_label.move(
+        #     QPoint(self.parent().size().width() / 2 - self.dataset_combobox.size().width() / 2 - self.dataset_label.size().width() - 10,
+        #            312
+        #            )
+        # )
+        # self.dataset_label.setStyleSheet("font-size: 20px;")
+        # self.dataset_label.setAlignment(Qt.AlignRight)
+
+        self.log_screen = QPlainTextEdit()
+        self.log_screen.setParent(self)
+        self.log_screen.setFixedSize(QSize(890, 150))
+        self.log_screen.move(QPoint(30, 400))
+        palette = QPalette()
+        palette.setColor(QPalette.Base, QColor(0, 0, 0))
+        palette.setColor(QPalette.Text, QColor(255, 255, 255))
+        self.log_screen.setPalette(palette)
+        self.log_screen.setReadOnly(True)
 
         self.button_back = QPushButton("Back")
         self.button_back.setParent(self)
         self.button_back.setFixedSize(200, 100)
-        self.button_back.move(QPoint(self.parent().size().width() / 3 - self.button_back.size().width() / 2, 400))
+        self.button_back.move(QPoint(30, 570))
         self.button_back.clicked.connect(self.back_page)
         self.button_back.setStyleSheet("font-size: 20px;")
+
+        self.button_load = QPushButton("Load")
+        self.button_load.setParent(self)
+        self.button_load.setFixedSize(200, 100)
+        self.button_load.move(QPoint(260, 570))
+        # self.button_load.clicked.connect(self.back_page)
+        self.button_load.setStyleSheet("font-size: 20px;")
+
+        self.button_train = QPushButton("Train")
+        self.button_train.setParent(self)
+        self.button_train.setFixedSize(200, 100)
+        self.button_train.move(QPoint(490, 570))
+        self.button_train.clicked.connect(self.test)
+        self.button_train.setStyleSheet("font-size: 20px;")
 
         self.button_next = QPushButton("Next")
         self.button_next.setParent(self)
         self.button_next.setFixedSize(200, 100)
-        self.button_next.move(QPoint(2 * self.parent().size().width() / 3 - self.button_next.size().width() / 2, 400))
-        self.button_next.clicked.connect(self.next_page)
+        self.button_next.move(QPoint(720, 570))
+        # self.button_next.clicked.connect(self.next_page)
         self.button_next.setStyleSheet("font-size: 20px;")
     
     def back_page(self):
@@ -104,3 +129,6 @@ class TrainModelPage(QWidget):
 
     def next_page(self):
         return NotImplementedError
+
+    def test(self):
+        print("test")

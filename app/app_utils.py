@@ -19,8 +19,20 @@ from PySide2.QtGui import (
     QColor,
     QPalette,
     QPixmap,
-    QImage
+    QImage,
+    QTextCursor
 )
+
+class OutLog:
+    def __init__(self, edit):
+        self.edit = edit
+
+    def write(self, m):
+        self.edit.moveCursor(QTextCursor.End)
+        self.edit.insertPlainText(m)
+
+    def flush(self):
+        pass
 
 def image_to_pixmap(image):
     height, width, channel = image.shape
@@ -40,7 +52,7 @@ def prediction_generator(image, backend, model, dataset, workdir):
         target_image = cv2.resize(target_image, (224, 224)) if model != "Onsunet" else cv2.resize(target_image, (48, 48))
         target_image = target_image.reshape(1,224,224,3) if model != "Onsunet" else target_image.reshape(1,48,48,1)
         net = tf.keras.models.load_model(workdir + "/trained_models/tensorflow/" + model.lower() + "/" + dataset.lower() + "/model.h5")
-        predictions = net.predict(target_image)
+        predictions = net.predict(target_image, verbose=0)
         return fer2013_label_translator(tf.argmax(predictions[0]).numpy())
     elif backend == "PyTorch":
         target_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
