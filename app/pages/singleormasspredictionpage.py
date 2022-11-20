@@ -31,6 +31,7 @@ class SingleOrMassPredictionPage(QWidget):
         self.button3.setStyleSheet("font-size: 20px;")
 
     def single_prediction_page(self):
+        self.parent().single_prediction_page.is_coming_from_train_page = False
         return self.parent().show_page(self.parent().single_prediction_page)
 
     def mass_prediction_page(self):

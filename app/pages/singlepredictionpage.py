@@ -47,6 +47,8 @@ class SinglePredictionPage(QWidget):
         self.button3.clicked.connect(self.predict)
         self.button3.setStyleSheet("font-size: 20px;")
 
+        self.is_coming_from_train_page = False
+
     def back_page(self):
         self.parent().show_page(self.parent().single_or_mass_prediction_page)
 
@@ -62,11 +64,11 @@ class SinglePredictionPage(QWidget):
         image = cv2.imread(self.filename)
         faces = au.get_faces(image, self.parent().workdir)
         if len(faces) > 0:
-            backend = self.parent().load_model_page.backend_combobox.currentText().lower()
-            model = self.parent().load_model_page.model_combobox.currentText().lower()
-            dataset = self.parent().load_model_page.dataset_combobox.currentText().lower()
+            backend = self.parent().load_model_page.backend_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.backend_combobox.currentText().lower()
+            model = self.parent().load_model_page.model_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.model_combobox.currentText().lower()
+            dataset = self.parent().load_model_page.dataset_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.dataset_combobox.currentText().lower()
             workdir = self.parent().workdir
-            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset), workdir) for (x, y, w, h) in faces]
+            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset),self.parent().train_model_page.trained_net, workdir) for (x, y, w, h) in faces]
         
         i=0
         for (x, y, w, h) in faces:

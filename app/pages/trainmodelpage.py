@@ -39,6 +39,7 @@ class TrainModelPage(QWidget):
         self.backend_combobox.setStyleSheet("font-size: 20px;")
         self.backend_combobox.addItem("Tensorflow")
         self.backend_combobox.addItem("PyTorch")
+        self.backend_combobox.setCurrentIndex(1)
 
         self.backend_label = QLabel("Backend:")
         self.backend_label.setParent(self)
@@ -55,6 +56,7 @@ class TrainModelPage(QWidget):
         self.model_combobox.addItem("ResNet")
         self.model_combobox.addItem("VGG")
         self.model_combobox.addItem("OnsuNet")
+        self.model_combobox.setCurrentIndex(2)
 
         self.model_label = QLabel("Model:")
         self.model_label.setParent(self)
@@ -71,6 +73,7 @@ class TrainModelPage(QWidget):
         self.dataset_combobox.addItem("FER2013")
         self.dataset_combobox.addItem("CK+")
         self.dataset_combobox.addItem("KDEF")
+        self.dataset_combobox.setCurrentIndex(1)
 
         self.dataset_label = QLabel("Dataset:")
         self.dataset_label.setParent(self)
@@ -207,6 +210,7 @@ class TrainModelPage(QWidget):
         self.button_save.setFixedSize(200, 100)
         self.button_save.move(QPoint(490, 570))
         self.button_save.setStyleSheet("font-size: 20px;")
+        self.button_save.pressed.connect(self.save_model)
         self.button_save.setEnabled(False)
 
         self.button_next = QPushButton("Next")
@@ -214,7 +218,10 @@ class TrainModelPage(QWidget):
         self.button_next.setFixedSize(200, 100)
         self.button_next.move(QPoint(720, 570))
         self.button_next.setStyleSheet("font-size: 20px;")
+        self.button_next.pressed.connect(self.next_page)
         self.button_next.setEnabled(False)
+
+        self.trained_net = None
 
         self.training_thread = TrainingThread(self.training_worker_procedure)
         self.training_thread.signals.result.connect(self.training_worker_result)
@@ -222,6 +229,19 @@ class TrainModelPage(QWidget):
     
     def back_page(self):
         self.parent().show_page(self.parent().train_or_load_page)
+
+    def next_page(self):
+        self.parent().single_prediction_page.is_coming_from_train_page = True
+        self.parent().show_page(self.parent().single_or_mass_prediction_page)
+
+    def save_model(self):
+        if self.trained_net is not None:
+            backend = self.backend_combobox.currentText().lower()
+            model = self.model_combobox.currentText().lower()
+            dataset = "ckplus" if self.dataset_combobox.currentText().lower() == "ck+" else self.dataset_combobox.currentText().lower()
+            workdir = self.parent().workdir
+            net = self.trained_net
+            au.model_saver(backend, model, dataset, workdir, net)
 
     @Slot(str)
     def append_text(self,text):
@@ -233,6 +253,16 @@ class TrainModelPage(QWidget):
         self.button_train.setEnabled(False)
         self.button_save.setEnabled(False)
         self.button_next.setEnabled(False)
+        self.backend_combobox.setEnabled(False)
+        self.model_combobox.setEnabled(False)
+        self.dataset_combobox.setEnabled(False)
+        self.optimizer_combobox.setEnabled(False)
+        self.epoch_spinbox.setEnabled(False)
+        self.batch_spinbox.setEnabled(False)
+        self.learning_rate_spinbox.setEnabled(False)
+        self.factor_spinbox.setEnabled(False)
+        self.patience_spinbox.setEnabled(False)
+
         self.training_thread.start()
         print("Training thread is started.")
 
@@ -273,6 +303,7 @@ class TrainModelPage(QWidget):
             self.button_back.setEnabled(True)
             self.button_train.setEnabled(True)
             self.button_save.setEnabled(True)
+            self.button_next.setEnabled(True)
             self.append_text("Training is finished.")
 
 class TrainingThreadSignals(QObject):

@@ -142,12 +142,13 @@ def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, o
         return net
 
 
-def prediction_generator(image, backend, model, dataset, workdir):
+def prediction_generator(image, backend, model, dataset, net, workdir):
     if backend == "tensorflow":
         target_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if model != "onsunet" else cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         target_image = cv2.resize(target_image, (224, 224)) if model != "onsunet" else cv2.resize(target_image, (48, 48))
         target_image = target_image.reshape(1,224,224,3) if model != "onsunet" else target_image.reshape(1,48,48,1)
-        net = tf.keras.models.load_model(workdir + "/trained_models/tensorflow/" + model + "/" + dataset + "/model.h5")
+        if net is None:
+            net = tf.keras.models.load_model(workdir + "/trained_models/tensorflow/" + model + "/" + dataset + "/model.h5")
         predictions = net.predict(target_image, verbose=0)
         return fer2013_label_translator(tf.argmax(predictions[0]).numpy())
     elif backend == "pytorch":
@@ -157,19 +158,26 @@ def prediction_generator(image, backend, model, dataset, workdir):
         if model == "onsunet":
             target_image = torchvision.transforms.Grayscale(num_output_channels=1)(target_image)
         target_image = torchvision.transforms.ToTensor()(target_image)
-        if model == "resnet":
-            net = resnet_pytorch.resnet50(img_channels=3, num_classes=7)
-        elif model == "vgg":
-            net = vgg_pytorch.VGG16(num_classes=7)
-        elif model == "onsunet":
-            net = onsunet_pytorch.Onsunet(num_classes=7)
-        net.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + model + "/" + dataset + "/model.pt", map_location=torch.device('cpu')))
+        if net is None:
+            if model == "resnet":
+                net = resnet_pytorch.resnet50(img_channels=3, num_classes=7)
+            elif model == "vgg":
+                net = vgg_pytorch.VGG16(num_classes=7)
+            elif model == "onsunet":
+                net = onsunet_pytorch.Onsunet(num_classes=7)
+            net.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + model + "/" + dataset + "/model.pt", map_location=torch.device('cpu')))
         net.eval()
         prediction = net(target_image.unsqueeze(0))
         emotion_label = torch.argmax(prediction)
         emotion_label = emotion_label.item()
         emotion_label = fer2013_label_translator(emotion_label)
         return emotion_label
+
+def model_saver(backend, model, dataset, workdir, net):
+    if backend == "tensorflow":
+        net.save(workdir + "/trained_models/tensorflow/" + model + "/" + dataset + "/model.h5")
+    elif backend == "pytorch":
+        torch.save(net.state_dict(), workdir + "/trained_models/pytorch/" + model + "/" + dataset + "/model.pt")
 
 def fer2013_label_translator(emotion_label):
     if emotion_label == 0:
