@@ -7,24 +7,12 @@ from PySide2.QtCore import (
     QPoint
 )
 from PySide2.QtGui import (
-    QColor,
-    QPalette,
-    QPixmap,
-    QImage
+    QPixmap
 )
 from PySide2.QtWidgets import (
-    QApplication,
-    QMainWindow,
     QPushButton,
-    QStackedLayout,
-    QStackedWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QGridLayout,
     QLabel,
-    QLayout,
     QWidget,
-    QComboBox,
     QFileDialog
 )
 
@@ -74,11 +62,11 @@ class SinglePredictionPage(QWidget):
         image = cv2.imread(self.filename)
         faces = au.get_faces(image, self.parent().workdir)
         if len(faces) > 0:
-            backend = self.parent().load_model_page.backend_combobox.currentText()
-            model = self.parent().load_model_page.model_combobox.currentText()
-            dataset = self.parent().load_model_page.dataset_combobox.currentText()
+            backend = self.parent().load_model_page.backend_combobox.currentText().lower()
+            model = self.parent().load_model_page.model_combobox.currentText().lower()
+            dataset = self.parent().load_model_page.dataset_combobox.currentText().lower()
             workdir = self.parent().workdir
-            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, dataset, workdir) for (x, y, w, h) in faces]
+            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset), workdir) for (x, y, w, h) in faces]
         
         i=0
         for (x, y, w, h) in faces:

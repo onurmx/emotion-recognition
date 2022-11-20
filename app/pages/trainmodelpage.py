@@ -1,33 +1,32 @@
+import app_utils as au
+
 from PySide2.QtCore import (
     QSize,
     Qt,
-    QPoint
+    QPoint,
+    Slot,
+    QThread,
 )
 from PySide2.QtGui import (
     QColor,
-    QPalette
+    QPalette,
+    QTextCursor
 )
 from PySide2.QtWidgets import (
-    QApplication,
-    QMainWindow,
     QPushButton,
-    QStackedLayout,
-    QStackedWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QGridLayout,
     QLabel,
-    QLayout,
     QWidget,
     QComboBox,
-    QPlainTextEdit,
     QSpinBox,
-    QDoubleSpinBox
+    QDoubleSpinBox,
+    QTextEdit
 )
 
 class TrainModelPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.training_thread = TrainingThread()
 
         self.backend_combobox = QComboBox()
         self.backend_combobox.setParent(self)
@@ -175,8 +174,7 @@ class TrainModelPage(QWidget):
         self.patience_label.setStyleSheet("font-size: 20px;")
         self.patience_label.setAlignment(Qt.AlignRight)
 
-
-        self.log_screen = QPlainTextEdit()
+        self.log_screen = QTextEdit()
         self.log_screen.setParent(self)
         self.log_screen.setFixedSize(QSize(890, 120))
         self.log_screen.move(QPoint(30, 430))
@@ -197,7 +195,7 @@ class TrainModelPage(QWidget):
         self.button_train.setParent(self)
         self.button_train.setFixedSize(200, 100)
         self.button_train.move(QPoint(260, 570))
-        self.button_train.clicked.connect(self.test)
+        self.button_train.pressed.connect(self.start_thread)
         self.button_train.setStyleSheet("font-size: 20px;")
 
         self.button_save = QPushButton("Save")
@@ -210,14 +208,28 @@ class TrainModelPage(QWidget):
         self.button_next.setParent(self)
         self.button_next.setFixedSize(200, 100)
         self.button_next.move(QPoint(720, 570))
-        # self.button_next.clicked.connect(self.next_page)
         self.button_next.setStyleSheet("font-size: 20px;")
     
     def back_page(self):
         self.parent().show_page(self.parent().train_or_load_page)
 
-    def next_page(self):
-        return NotImplementedError
+    @Slot(str)
+    def append_text(self,text):
+        self.log_screen.moveCursor(QTextCursor.End)
+        self.log_screen.insertPlainText(text)
 
-    def test(self):
-        print("test")
+    def start_thread(self):
+        self.training_thread.start()
+
+class TrainingThread(QThread):
+    def __init__(self):
+        super().__init__()
+        self.setTerminationEnabled(True)
+
+    def run(self):
+        print("Training Thread Started")
+
+        au.trainer(backend="pytorch", model="onsunet", dataset="ckplus", epochs=2, lr=0.001, factor=0.75, patience=5, batch_size=8, workdir="D:/emo/appfiles")
+
+        self.quit()
+        print("Training Thread Ended")

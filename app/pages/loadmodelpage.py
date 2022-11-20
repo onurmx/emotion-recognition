@@ -3,21 +3,9 @@ from PySide2.QtCore import (
     Qt,
     QPoint
 )
-from PySide2.QtGui import (
-    QColor,
-    QPalette
-)
 from PySide2.QtWidgets import (
-    QApplication,
-    QMainWindow,
     QPushButton,
-    QStackedLayout,
-    QStackedWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QGridLayout,
     QLabel,
-    QLayout,
     QWidget,
     QComboBox
 )
