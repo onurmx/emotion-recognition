@@ -1,4 +1,6 @@
 import app_utils as au
+import sys
+import traceback
 
 from PySide2.QtCore import (
     QSize,
@@ -6,6 +8,10 @@ from PySide2.QtCore import (
     QPoint,
     Slot,
     QThread,
+    QObject,
+    Signal,
+    QRunnable,
+    QThreadPool
 )
 from PySide2.QtGui import (
     QColor,
@@ -25,8 +31,6 @@ from PySide2.QtWidgets import (
 class TrainModelPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.training_thread = TrainingThread()
 
         self.backend_combobox = QComboBox()
         self.backend_combobox.setParent(self)
@@ -203,12 +207,18 @@ class TrainModelPage(QWidget):
         self.button_save.setFixedSize(200, 100)
         self.button_save.move(QPoint(490, 570))
         self.button_save.setStyleSheet("font-size: 20px;")
+        self.button_save.setEnabled(False)
 
         self.button_next = QPushButton("Next")
         self.button_next.setParent(self)
         self.button_next.setFixedSize(200, 100)
         self.button_next.move(QPoint(720, 570))
         self.button_next.setStyleSheet("font-size: 20px;")
+        self.button_next.setEnabled(False)
+
+        self.training_thread = TrainingThread(self.training_worker_procedure)
+        self.training_thread.signals.result.connect(self.training_worker_result)
+        self.training_thread.signals.finished.connect(self.training_worker_finished)
     
     def back_page(self):
         self.parent().show_page(self.parent().train_or_load_page)
@@ -219,17 +229,62 @@ class TrainModelPage(QWidget):
         self.log_screen.insertPlainText(text)
 
     def start_thread(self):
+        self.button_back.setEnabled(False)
+        self.button_train.setEnabled(False)
+        self.button_save.setEnabled(False)
+        self.button_next.setEnabled(False)
         self.training_thread.start()
+        print("Training thread is started.")
+
+    def training_worker_procedure(self):
+        backend = self.backend_combobox.currentText().lower()
+        model = self.model_combobox.currentText().lower()
+        dataset = "ckplus" if self.dataset_combobox.currentText().lower() == "ck+" else self.dataset_combobox.currentText().lower()
+        epochs = self.epoch_spinbox.value()
+        lr = self.learning_rate_spinbox.value()
+        factor = self.factor_spinbox.value()
+        patience = self.patience_spinbox.value()
+        batch_size = self.batch_spinbox.value()
+        workdir = self.parent().workdir
+        
+        trained_net = au.trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, workdir)
+        return trained_net
+
+    def training_worker_result(self, trained_net):
+        self.trained_net = trained_net
+
+    def training_worker_finished(self):
+        self.training_thread.quit()
+        self.training_thread.wait()
+        if self.trained_net is not None:
+            self.button_back.setEnabled(True)
+            self.button_train.setEnabled(True)
+            self.button_save.setEnabled(True)
+            self.append_text("Training is finished.")
+
+class TrainingThreadSignals(QObject):
+    finished = Signal()
+    error = Signal(tuple)
+    result = Signal(object)
+    progress = Signal(int)
 
 class TrainingThread(QThread):
-    def __init__(self):
-        super().__init__()
-        self.setTerminationEnabled(True)
+    def __init__(self, fn, *args, **kwargs):
+        super(TrainingThread, self).__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = TrainingThreadSignals()
 
+    @Slot()
     def run(self):
-        print("Training Thread Started")
-
-        au.trainer(backend="pytorch", model="onsunet", dataset="ckplus", epochs=2, lr=0.001, factor=0.75, patience=5, batch_size=8, workdir="D:/emo/appfiles")
-
-        self.quit()
-        print("Training Thread Ended")
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)
+        finally:
+            self.signals.finished.emit()
