@@ -245,9 +245,22 @@ class TrainModelPage(QWidget):
         factor = self.factor_spinbox.value()
         patience = self.patience_spinbox.value()
         batch_size = self.batch_spinbox.value()
+        optimizer = self.optimizer_combobox.currentText().lower()
         workdir = self.parent().workdir
         
-        trained_net = au.trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, workdir)
+        print("Training Parameters")
+        print("-------------------")
+        print("Backend: ", backend)
+        print("Model: ", model)
+        print("Dataset: ", dataset)
+        print("Epochs: ", epochs)
+        print("Learning Rate: ", lr)
+        print("Factor: ", factor)
+        print("Patience: ", patience)
+        print("Batch Size: ", batch_size)
+        print("Optimizer: ", optimizer)
+
+        trained_net = au.trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, optimizer, workdir)
         return trained_net
 
     def training_worker_result(self, trained_net):

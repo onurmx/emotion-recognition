@@ -28,7 +28,7 @@ class WriteStream(object):
         self.queue.put(text)
 
     def flush(self):
-        self.queue.empty()
+        pass
 
 class StreamListener(QThread):
     text_signal = Signal(str)

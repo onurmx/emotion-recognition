@@ -37,9 +37,56 @@ from PySide2.QtGui import (
     QImage
 )
 
-def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, workdir):
+def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, optimizer, workdir):
     if backend == "tensorflow":
-        return NotImplementedError
+        if optimizer == "adam":
+            opt_func = tf.keras.optimizers.Adam(learning_rate=lr)
+        elif optimizer == "sgd":
+            opt_func = tf.keras.optimizers.SGD(learning_rate=lr)
+
+        if dataset == "fer2013":
+            training_data, validation_data, testing_data, steps_per_epoch, validation_steps, test_steps = fer2013_tensorflow.load_fer2013(
+                filepath=(workdir + "/" + dataset + "/fer2013.csv"),
+                size=(48 if model == "onsunet" else 224),
+                batch_size=batch_size,
+                cfg_OnsuNet=(True if model == "onsunet" else False)
+            )
+        elif dataset == "ckplus":
+            training_data, validation_data, testing_data, steps_per_epoch, validation_steps, test_steps = ckplus_tensorflow.load_ckplus(
+                filepath=(workdir + "/training_datas/" + dataset),
+                size=(48 if model == "onsunet" else 224),
+                batch_size=batch_size,
+                cfg_OnsuNet=(True if model == "onsunet" else False)
+            )
+        elif dataset == "kdef":
+            training_data, validation_data, testing_data, steps_per_epoch, validation_steps, test_steps = kdef_tensorflow.load_kdef(
+                filepath=(workdir + "/training_datas/" + dataset),
+                size=(48 if model == "onsunet" else 224),
+                batch_size=batch_size,
+                cfg_OnsuNet=(True if model == "onsunet" else False)
+            )
+
+        if model == "resnet":
+            net = resnet_tensorflow.Resnet()
+        elif model == "vgg":
+            net = vgg_tensorflow.VGG16()
+        elif model == "onsunet":
+            net = onsunet_tensorflow.Onsunet()
+
+        net.build_model()
+        net.compile_model(optimizer=opt_func)
+        reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+            monitor="val_accuracy",
+            factor=factor,
+            patience=patience,
+            verbose=0,
+            mode="max",
+            min_delta=0,
+            cooldown=0,
+            min_lr=0,
+        )
+        net.train_model(training_data, validation_data, epochs, steps_per_epoch, validation_steps, callbacks = [reduce_lr])
+        return net
     elif backend == "pytorch":
         device = dm.get_default_device()
 
@@ -74,6 +121,11 @@ def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, w
                 batch_size=batch_size,
                 cfg_OnsuNet= True if model == "onsunet" else False
             )
+
+        if optimizer == "adam":
+            opt_func = torch.optim.Adam
+        elif optimizer == "sgd":
+            opt_func = torch.optim.SGD
         
         train_pytorch.fit(
             epochs=epochs,
@@ -84,7 +136,7 @@ def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, w
             factor=factor,
             patience=patience,
             weight_decay=0,
-            opt_func=torch.optim.Adam
+            opt_func=opt_func
         )
 
         return net
