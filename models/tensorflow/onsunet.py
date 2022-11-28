@@ -8,26 +8,27 @@ class Onsunet:
         i = tf.keras.layers.Input(shape=(48, 48, 1))
 
         # block 1
-        x = tf.keras.layers.Conv2D(filters=256, kernel_size=3, activation='relu', padding='same')(i)
-        x = tf.keras.layers.Conv2D(filters=512, kernel_size=3, activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(filters=192, kernel_size=3, activation='relu', padding='same')(i)
         x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
         x = tf.keras.layers.Dropout(0.4)(x)
 
         # block 2
-        x = tf.keras.layers.Conv2D(filters=384, kernel_size=3, activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(filters=256, kernel_size=3, activation='relu', padding='same')(x)
         x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
         x = tf.keras.layers.Dropout(0.4)(x)
 
         # block 3
-        x = tf.keras.layers.Conv2D(filters=192, kernel_size=3, activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(filters=320, kernel_size=3, activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(filters=384, kernel_size=3, activation='relu', padding='same')(x)
         x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
         x = tf.keras.layers.Dropout(0.4)(x)
 
         # block 4
-        x = tf.keras.layers.Conv2D(filters=384, kernel_size=3, activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(filters=448, kernel_size=3, activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(filters=512, kernel_size=3, activation='relu', padding='same')(x)
         x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(x)
         x = tf.keras.layers.Dropout(0.4)(x)
