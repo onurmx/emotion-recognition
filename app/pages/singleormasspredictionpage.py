@@ -35,7 +35,8 @@ class SingleOrMassPredictionPage(QWidget):
         return self.parent().show_page(self.parent().single_prediction_page)
 
     def mass_prediction_page(self):
-        return NotImplementedError
+        self.parent().mass_prediction_page.is_coming_from_train_page = False
+        return self.parent().show_page(self.parent().mass_prediction_page)
 
     def back_page(self):
         self.parent().show_page(self.parent().load_model_page)

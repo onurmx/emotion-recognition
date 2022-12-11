@@ -6,6 +6,7 @@ import pages.loadmodelpage
 import pages.trainorloadpage
 import pages.trainmodelpage
 import pages.welcomepage
+import pages.masspredictionpage
 import pages.singleormasspredictionpage
 import pages.singlepredictionpage
 import queue
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow):
         self.load_model_page = pages.loadmodelpage.LoadModelPage(self)
         self.single_or_mass_prediction_page = pages.singleormasspredictionpage.SingleOrMassPredictionPage(self)
         self.single_prediction_page = pages.singlepredictionpage.SinglePredictionPage(self)
+        self.mass_prediction_page = pages.masspredictionpage.MassPredictionPage(self)
 
         self.message_queue = queue.Queue()
         sys.stdout = WriteStream(self.message_queue)
