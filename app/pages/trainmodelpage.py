@@ -232,6 +232,7 @@ class TrainModelPage(QWidget):
 
     def next_page(self):
         self.parent().single_prediction_page.is_coming_from_train_page = True
+        self.parent().mass_prediction_page.is_coming_from_train_page = True
         self.parent().show_page(self.parent().single_or_mass_prediction_page)
 
     def save_model(self):
