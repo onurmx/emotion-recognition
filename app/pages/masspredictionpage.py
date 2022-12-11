@@ -1,15 +1,9 @@
 import app_utils as au
 import cv2
 import os
-import sys
-import traceback
 
 from PySide2.QtCore import (
-    QPoint,
-    QObject,
-    Signal,
-    Slot,
-    QThread
+    QPoint
 )
 from PySide2.QtWidgets import (
     QPushButton,
@@ -81,11 +75,8 @@ class MassPredictionPage(QWidget):
         self.button_predict.setParent(self)
         self.button_predict.setFixedSize(200, 100)
         self.button_predict.move(QPoint(2 * self.parent().size().width() / 3 - self.button_predict.size().width() / 2, 550))
-        self.button_predict.clicked.connect(self.start_thread)
+        self.button_predict.clicked.connect(self.predict)
         self.button_predict.setStyleSheet("font-size: 20px;")
-
-        self.prediction_thread = MassPredictionThread(self.prediction_worker_procedure)
-        self.prediction_thread.signals.finished.connect(self.prediction_worker_finished)
 
         self.is_coming_from_train_page = False
 
@@ -98,14 +89,10 @@ class MassPredictionPage(QWidget):
     def back_page(self):
         self.parent().show_page(self.parent().single_or_mass_prediction_page)
 
-    def start_thread(self):
+    def predict(self):
         self.button_back.setEnabled(False)
         self.button_predict.setEnabled(False)
 
-        self.prediction_thread.start()
-
-    def prediction_worker_procedure(self):
-        #create a single file for output
         if self.path_to_save_predictions.text() != "":
             output_file = open(os.path.join(self.path_to_save_predictions.text(), "predictions.csv"), "w")
 
@@ -128,38 +115,5 @@ class MassPredictionPage(QWidget):
         if self.path_to_save_predictions.text() != "":
             output_file.close()
 
-        return 1
-
-    def prediction_worker_finished(self):
-        self.prediction_thread.quit()
-        self.prediction_thread.wait()
-
         self.button_back.setEnabled(True)
         self.button_predict.setEnabled(True)
-
-class MassPredictionThreadSignals(QObject):
-    finished = Signal()
-    error = Signal(tuple)
-    result = Signal(object)
-    progress = Signal(int)
-
-class MassPredictionThread(QThread):
-    def __init__(self, fn, *args, **kwargs):
-        super(MassPredictionThread, self).__init__()
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-        self.signals = MassPredictionThreadSignals()
-
-    @Slot()
-    def run(self):
-        try:
-            result = self.fn(*self.args, **self.kwargs)
-        except:
-            traceback.print_exc()
-            exctype, value = sys.exc_info()[:2]
-            self.signals.error.emit((exctype, value, traceback.format_exc()))
-        else:
-            self.signals.result.emit(result)
-        finally:
-            self.signals.finished.emit()
