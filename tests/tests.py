@@ -225,6 +225,40 @@ class TensorflowDatasetTest(unittest.TestCase):
 
         self.assertEqual(type(testing_data).__name__, "NumpyArrayIterator")
 
+class PytorchModelTest(unittest.TestCase):
+    def test_model_onsunet(self):
+        from models.pytorch import onsunet
+        model = onsunet.Onsunet()
+        self.assertEqual(type(model).__name__, "Onsunet")
+
+    def test_model_resnet(self):
+        from models.pytorch import resnet
+        model = resnet.resnet50(img_channels=3, num_classes=7)
+        self.assertEqual(type(model).__name__, "ResNet")
+
+    def test_model_vgg(self):
+        from models.pytorch import vgg
+        model = vgg.VGG16(num_classes=7)
+        self.assertEqual(type(model).__name__, "VGG16")
+
+class TensorflowModelTest(unittest.TestCase):
+    def test_model_onsunet(self):
+        from models.tensorflow import onsunet
+        model = onsunet.Onsunet()
+        model.build_model()
+        self.assertEqual(type(model.model).__name__, "Functional")
+
+    def test_model_resnet(self):
+        from models.tensorflow import resnet
+        model = resnet.Resnet()
+        model.build_model()
+        self.assertEqual(type(model.model).__name__, "Functional")
+
+    def test_model_vgg(self):
+        from models.tensorflow import vgg
+        model = vgg.VGG16()
+        model.build_model()
+        self.assertEqual(type(model.model).__name__, "Functional")
 
 if __name__ == '__main__':
     unittest.main()
