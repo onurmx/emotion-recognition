@@ -179,6 +179,22 @@ def model_saver(backend, model, dataset, workdir, net):
     elif backend == "pytorch":
         torch.save(net.state_dict(), workdir + "/trained_models/pytorch/" + model + "/" + dataset + "/model.pt")
 
+def ckplus_label_translator(emotion_label):
+    if emotion_label == 0:
+        return "Angry"
+    elif emotion_label == 1:
+        return "Contempt"
+    elif emotion_label == 2:
+        return "Disgust"
+    elif emotion_label == 3:
+        return "Fear"
+    elif emotion_label == 4:
+        return "Happy"
+    elif emotion_label == 5:
+        return "Sad"
+    elif emotion_label == 6:
+        return "Surprise"
+
 def fer2013_label_translator(emotion_label):
     if emotion_label == 0:
         return "Angry"

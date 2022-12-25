@@ -5,7 +5,7 @@ import sklearn.model_selection as skl
 import tensorflow as tf
 
 def load_kdef(filepath, size, batch_size=64, cfg_OnsuNet = False):
-    labels = {'AN': 0, 'DI': 1, 'AF': 2, 'HA': 3, 'SA': 4, 'SU': 5, 'NE': 6}
+    labels_arg = {'AN': 0, 'DI': 1, 'AF': 2, 'HA': 3, 'SA': 4, 'SU': 5, 'NE': 6}
 
     file_paths = []
     for folder, subfolders, filenames in os.walk(filepath):
@@ -24,7 +24,7 @@ def load_kdef(filepath, size, batch_size=64, cfg_OnsuNet = False):
         file_basename = os.path.basename(file_path)
         file_emotion = file_basename[4:6]
         try:
-            labels[file_arg] = labels[file_emotion]
+            labels[file_arg] = labels_arg[file_emotion]
         except:
             continue
 
