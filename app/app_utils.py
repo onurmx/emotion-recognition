@@ -150,7 +150,12 @@ def prediction_generator(image, backend, model, dataset, net, workdir):
         if net is None:
             net = tf.keras.models.load_model(workdir + "/trained_models/tensorflow/" + model + "/" + dataset + "/model.h5")
         predictions = net.predict(target_image, verbose=0)
-        return fer2013_label_translator(tf.argmax(predictions[0]).numpy())
+        if dataset == "fer2013":
+            return fer2013_label_translator(tf.argmax(predictions[0]).numpy())
+        elif dataset == "ckplus":
+            return ckplus_label_translator(tf.argmax(predictions[0]).numpy())
+        elif dataset == "kdef":
+            return kdef_label_translator(tf.argmax(predictions[0]).numpy())
     elif backend == "pytorch":
         target_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         target_image = cv2.resize(target_image, (224, 224)) if model != "onsunet" else cv2.resize(target_image, (48, 48))
@@ -170,8 +175,12 @@ def prediction_generator(image, backend, model, dataset, net, workdir):
         prediction = net(target_image.unsqueeze(0))
         emotion_label = torch.argmax(prediction)
         emotion_label = emotion_label.item()
-        emotion_label = fer2013_label_translator(emotion_label)
-        return emotion_label
+        if dataset == "fer2013":
+            return fer2013_label_translator(emotion_label)
+        elif dataset == "ckplus":
+            return ckplus_label_translator(emotion_label)
+        elif dataset == "kdef":
+            return kdef_label_translator(emotion_label)
 
 def model_saver(backend, model, dataset, workdir, net):
     if backend == "tensorflow":
@@ -202,6 +211,22 @@ def fer2013_label_translator(emotion_label):
         return "Disgust"
     elif emotion_label == 2:
         return "Fear"
+    elif emotion_label == 3:
+        return "Happy"
+    elif emotion_label == 4:
+        return "Sad"
+    elif emotion_label == 5:
+        return "Surprise"
+    elif emotion_label == 6:
+        return "Neutral"
+
+def kdef_label_translator(emotion_label):
+    if emotion_label == 0:
+        return "Angry"
+    elif emotion_label == 1:
+        return "Disgust"
+    elif emotion_label == 2:
+        return "Afraid"
     elif emotion_label == 3:
         return "Happy"
     elif emotion_label == 4:
