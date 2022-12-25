@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Emotify")
         self.setFixedSize(QSize(950, 700))
 
-        self.workdir = "D:/emo/appfiles"
+        self.workdir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "appfiles")
 
         self.welcome_page = pages.welcomepage.WelcomePage(self)
         self.train_or_load_page = pages.trainorloadpage.TrainOrLoadPage(self)

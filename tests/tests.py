@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import unittest
 
 class PytorchDatasetTest(unittest.TestCase):
-    workdir = "D:/emo/appfiles"
+    workdir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "appfiles")
 
     def test_dataset_ckplus_48_1x1_p1(self):
         from datasets.pytorch import ckplus as ckplus_pytorch
@@ -241,7 +241,7 @@ class PytorchDatasetTest(unittest.TestCase):
         self.assertEqual(type(test_dl).__name__, "DeviceDataLoader")
 
 class TensorflowDatasetTest(unittest.TestCase):
-    workdir = "D:/emo/appfiles"
+    workdir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "appfiles")
 
     def test_dataset_ckplus_48_1x1_p1(self):
         from datasets.tensorflow import ckplus as ckplus_tensorflow
