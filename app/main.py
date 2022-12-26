@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
 
 import pages.loadmodelpage
 import pages.trainorloadpage
@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Emotify")
         self.setFixedSize(QSize(950, 700))
 
-        self.workdir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "appfiles")
+        self.workdir = os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), "appfiles")
 
         self.welcome_page = pages.welcomepage.WelcomePage(self)
         self.train_or_load_page = pages.trainorloadpage.TrainOrLoadPage(self)
