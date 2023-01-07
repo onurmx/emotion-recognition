@@ -20,6 +20,13 @@ class WelcomePage(QWidget):
         self.label.setStyleSheet("font-size: 45px; font-weight: bold;")
         self.label.setAlignment(Qt.AlignCenter)
 
+        self.cr_label = QLabel("Onur Caglayan, Sueda Hatipoglu, 2023")
+        self.cr_label.setParent(self)
+        self.cr_label.setFixedSize(QSize(800, 100))
+        self.cr_label.move(QPoint(self.parent().size().width() / 2 - self.cr_label.size().width() / 2, 625))
+        self.cr_label.setStyleSheet("font-size: 20px;")
+        self.cr_label.setAlignment(Qt.AlignCenter)
+
         self.button = QPushButton("Next")
         self.button.setParent(self)
         self.button.setFixedSize(QSize(200, 100))
