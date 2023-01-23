@@ -91,4 +91,6 @@ class LoadModelPage(QWidget):
         self.parent().show_page(self.parent().train_or_load_page)
 
     def next_page(self):
+        self.parent().single_prediction_page.is_coming_from_train_page = False
+        self.parent().mass_prediction_page.is_coming_from_train_page = False
         self.parent().show_page(self.parent().single_or_mass_prediction_page)

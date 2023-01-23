@@ -243,6 +243,7 @@ class TrainModelPage(QWidget):
             workdir = self.parent().workdir
             net = self.trained_net
             au.model_saver(backend, model, dataset, workdir, net)
+            self.button_next.setEnabled(True)
 
     @Slot(str)
     def append_text(self,text):
@@ -304,7 +305,6 @@ class TrainModelPage(QWidget):
             self.button_back.setEnabled(True)
             self.button_train.setEnabled(True)
             self.button_save.setEnabled(True)
-            self.button_next.setEnabled(True)
             self.append_text("Training is finished.")
 
 class TrainingThreadSignals(QObject):
