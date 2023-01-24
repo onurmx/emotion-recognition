@@ -68,7 +68,7 @@ class SinglePredictionPage(QWidget):
             model = self.parent().load_model_page.model_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.model_combobox.currentText().lower()
             dataset = self.parent().load_model_page.dataset_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.dataset_combobox.currentText().lower()
             workdir = self.parent().workdir
-            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset),self.parent().train_model_page.trained_net, workdir) for (x, y, w, h) in faces]
+            emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset), workdir) for (x, y, w, h) in faces]
         
         i=0
         for (x, y, w, h) in faces:

@@ -107,7 +107,7 @@ class MassPredictionPage(QWidget):
                 model = self.parent().load_model_page.model_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.model_combobox.currentText().lower()
                 dataset = self.parent().load_model_page.dataset_combobox.currentText().lower() if self.is_coming_from_train_page == False else self.parent().train_model_page.dataset_combobox.currentText().lower()
                 workdir = self.parent().workdir
-                emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset),self.parent().train_model_page.trained_net, workdir) for (x, y, w, h) in faces]
+                emotions = [au.prediction_generator(image[y:y+h, x:x+w],backend, model, ("ckplus" if dataset =="ck+" else dataset), workdir) for (x, y, w, h) in faces]
                 for emotion in emotions:
                     if self.path_to_save_predictions.text() != "":
                         output_file.write(image_path + "," + emotion + "\n")
