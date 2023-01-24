@@ -46,7 +46,7 @@ def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, o
 
         if dataset == "fer2013":
             training_data, validation_data, testing_data, steps_per_epoch, validation_steps, test_steps = fer2013_tensorflow.load_fer2013(
-                filepath=(workdir + "/" + dataset + "/fer2013.csv"),
+                filepath=(workdir + "/training_datas/" + dataset + "/fer2013.csv"),
                 size=(48 if model == "onsunet" else 224),
                 batch_size=batch_size,
                 cfg_OnsuNet=(True if model == "onsunet" else False)
@@ -99,7 +99,7 @@ def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, o
 
         if dataset == "fer2013":
             train_dl, valid_dl, test_dl = fer2013_pytorch.load_fer2013(
-                workdir + "/" + dataset + "/fer2013.csv",
+                workdir + "/training_datas/" + dataset + "/fer2013.csv",
                 device,
                 48 if model == "onsunet" else 224,
                 batch_size=batch_size,
