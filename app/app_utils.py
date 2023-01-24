@@ -1,4 +1,5 @@
 import cv2
+import os
 import tensorflow as tf
 import torch
 import torchvision
@@ -35,6 +36,10 @@ from utils.pytorch import (
 from PySide2.QtGui import (
     QPixmap,
     QImage
+)
+
+from PySide2.QtWidgets import (
+    QMessageBox
 )
 
 def trainer(backend, model, dataset, epochs, lr, factor, patience, batch_size, optimizer, workdir):
@@ -147,6 +152,9 @@ def prediction_generator(image, backend, model, dataset, workdir):
         target_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if model != "onsunet" else cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         target_image = cv2.resize(target_image, (224, 224)) if model != "onsunet" else cv2.resize(target_image, (48, 48))
         target_image = target_image.reshape(1,224,224,3) if model != "onsunet" else target_image.reshape(1,48,48,1)
+        if os.path.isfile(workdir + "/trained_models/tensorflow/" + model + "/" + dataset + "/model.h5") == False:
+            QMessageBox.warning(None, "Warning", "Pretrained model couldn't found. First train a model!", QMessageBox.Ok)
+            return
         net = tf.keras.models.load_model(workdir + "/trained_models/tensorflow/" + model + "/" + dataset + "/model.h5")
         predictions = net.predict(target_image, verbose=0)
         if dataset == "fer2013":
@@ -168,6 +176,10 @@ def prediction_generator(image, backend, model, dataset, workdir):
             net = vgg_pytorch.VGG16(num_classes=7)
         elif model == "onsunet":
             net = onsunet_pytorch.Onsunet(num_classes=7)
+        
+        if os.path.isfile(workdir + "/trained_models/pytorch/" + model + "/" + dataset + "/model.pt") == False:
+            QMessageBox.warning(None, "Warning", "Pretrained model couldn't found. First train a model!", QMessageBox.Ok)
+            return
         net.load_state_dict(torch.load(workdir + "/trained_models/pytorch/" + model + "/" + dataset + "/model.pt", map_location=torch.device('cpu')))
         net.eval()
         prediction = net(target_image.unsqueeze(0))
