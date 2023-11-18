@@ -16,5 +16,5 @@ FER2013, KDEF, and CK+ datasets are used to train classifier. Each dataset is pr
 To execute the application, it is enough to run main.py file.
 
 ```
-py main.py
+python main.py
 ```
